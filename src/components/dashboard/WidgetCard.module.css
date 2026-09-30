@@ -1,0 +1,265 @@
+.card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  background: var(--input-background);
+  border: 1px solid var(--line-default);
+  border-radius: var(--radius-lg);
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.card:hover,
+.card[data-open] {
+  border-color: var(--button-stroke-active);
+}
+
+/* a soft light sweep while a widget re-reads its tool */
+.card[data-refreshing]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.045) 45%, transparent 70%);
+  background-size: 250% 100%;
+  animation: sweep 0.9s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes sweep {
+  from {
+    background-position: 130% 0;
+  }
+  to {
+    background-position: -30% 0;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-left: -4px;
+}
+
+.header[data-drag-handle] {
+  cursor: grab;
+}
+
+.card[data-variant='feed'] .header {
+  margin-left: 0;
+}
+
+.grip {
+  display: inline-flex;
+  color: var(--icon-primary);
+  opacity: 0.7;
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease;
+}
+
+.card:hover .grip {
+  opacity: 1;
+  color: var(--icon-active);
+}
+
+.name {
+  font: 500 12px/1 var(--font-family-base);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.nameSuffix {
+  color: var(--text-tertiary);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.iconButton {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--icon-primary);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.iconButton:hover,
+.iconButton[aria-expanded='true'] {
+  color: var(--icon-active);
+  background: var(--button-background);
+}
+
+.iconButton[data-spinning] :global(svg) {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.menuButton {
+  opacity: 0;
+  margin-right: -4px;
+}
+
+.card:hover .menuButton,
+.menuButton[aria-expanded='true'],
+.menuButton:focus-visible {
+  opacity: 1;
+}
+
+.rangeButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--button-stroke);
+  background: transparent;
+  font: 500 12px/1 var(--font-family-base);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.rangeButton:hover {
+  background: var(--button-background);
+}
+
+.privateBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid var(--button-stroke-active);
+  font: 500 10px/1 var(--font-family-base);
+  color: var(--text-secondary);
+}
+
+.updated {
+  font: 500 10px/1 var(--font-family-base);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: contentIn 0.35s ease;
+}
+
+@keyframes contentIn {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.headline {
+  margin: 0;
+  font: 600 16px/1.3 var(--font-family-base);
+  color: var(--text-primary);
+  letter-spacing: -0.1px;
+}
+
+.sub {
+  margin: 0;
+  font: 500 12px/1.4 var(--font-family-base);
+  color: var(--text-tertiary);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  font: 500 12px/1.4 var(--font-family-base);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s ease;
+}
+
+.cta :global(svg) {
+  transition: transform 0.15s ease;
+}
+
+.cta:hover {
+  color: var(--text-primary);
+}
+
+.cta:hover :global(svg) {
+  transform: translateX(2px);
+}
+
+.resizeGlyph {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  display: inline-flex;
+  color: var(--icon-primary);
+  opacity: 0.55;
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease;
+}
+
+.card:hover .resizeGlyph {
+  opacity: 1;
+  color: var(--icon-active);
+}
+
+/* feed (Updates panel) cards size to their content */
+.card[data-variant='feed'] {
+  height: auto;
+}
+
+.card[data-variant='feed'] .content {
+  max-height: 240px;
+}

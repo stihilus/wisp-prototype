@@ -1,0 +1,132 @@
+.wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.protectedTab {
+  position: relative;
+  z-index: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px var(--padding-md) 32px;
+  margin-bottom: -26px;
+  border: 1px solid var(--input-stroke);
+  border-bottom: none;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: linear-gradient(180deg, var(--input-background) 69.8%, var(--field-background-success) 100%);
+  font: var(--font-caption);
+  color: var(--text-primary);
+}
+
+.dot {
+  color: var(--icon-success);
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+}
+
+.inputRow {
+  background: var(--input-background);
+  border: 1px solid var(--input-stroke);
+  border-radius: var(--radius-xl);
+  height: 56px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+  padding: var(--padding-md) var(--padding-md) var(--padding-md) var(--padding-lg);
+}
+
+.textarea {
+  flex: 1;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: var(--font-body-md);
+  color: var(--text-primary);
+  max-height: 24px;
+  line-height: 1.4;
+  font-family: var(--font-family-base);
+}
+
+.textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+.micButton {
+  flex-shrink: 0;
+  background: var(--button-background);
+  border: none;
+  color: var(--icon-active);
+  border-radius: var(--radius-full);
+  padding: var(--padding-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.toolbarGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+}
+
+.circleButton {
+  padding: var(--padding-sm);
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: none;
+  color: var(--icon-primary);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.circleButton:hover {
+  background: var(--button-background);
+  color: var(--icon-active);
+}
+
+.contextUsage {
+  font: var(--font-body-md);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.pillButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: var(--padding-sm) var(--padding-md);
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: none;
+  font: var(--font-body-md);
+  color: var(--text-tertiary);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pillButton:hover {
+  background: var(--button-background);
+}
+
+.pillButton[data-active='true'] {
+  color: var(--text-primary);
+  background: var(--button-background);
+}

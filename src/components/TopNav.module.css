@@ -1,0 +1,93 @@
+.topNav {
+  height: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--padding-lg);
+  -webkit-app-region: drag;
+}
+
+.left,
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+}
+
+.traffic {
+  -webkit-app-region: no-drag;
+}
+
+.navIcons {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+}
+
+.iconButton {
+  -webkit-app-region: no-drag;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--icon-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.iconButton:hover {
+  color: var(--icon-active);
+}
+
+.privateLabel {
+  font: var(--font-caption);
+  color: var(--text-tertiary);
+}
+
+.privateIcon {
+  color: var(--icon-primary);
+}
+
+.newsButton {
+  -webkit-app-region: no-drag;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-xs);
+  padding: var(--padding-xs) var(--padding-sm);
+  border-radius: var(--radius-full);
+  background: var(--button-background);
+  border: none;
+  color: var(--icon-primary);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.newsButton:hover {
+  background: var(--field-stroke);
+  color: var(--icon-active);
+}
+
+.newsLabel {
+  font: var(--font-caption);
+  color: var(--text-primary);
+}
+
+.newsDot {
+  color: var(--brand-500);
+  border-radius: var(--radius-full);
+  animation: newsDotPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes newsDotPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 193, 109, 0.6);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 5px 3px rgba(255, 193, 109, 0.55);
+  }
+}

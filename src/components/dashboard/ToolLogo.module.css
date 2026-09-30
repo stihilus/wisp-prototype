@@ -1,0 +1,43 @@
+.tile {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--button-background);
+  color: var(--icon-active);
+  overflow: hidden;
+}
+
+.tile[data-fit='white'] {
+  background: #ffffff;
+}
+
+.tile[data-fit='bleed'] {
+  background: #2aabee;
+}
+
+.custom {
+  color: var(--brand-500);
+}
+
+.img {
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+.img[data-fit='cover'] {
+  object-fit: cover;
+}
+
+.img[data-fit='contain'],
+.img[data-fit='white'] {
+  object-fit: contain;
+}
+
+/* Telegram's mark is a circle — scale it past the tile so it reads as a square app icon */
+.img[data-fit='bleed'] {
+  width: 128%;
+  height: 128%;
+  max-width: none;
+}

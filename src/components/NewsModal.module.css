@@ -1,0 +1,257 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  width: 640px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 64px);
+  background: var(--field-background);
+  border: 1px solid var(--field-stroke);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  animation: popIn 0.18s ease;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gap-lg);
+  padding: 32px 32px 20px;
+  flex-shrink: 0;
+}
+
+.headerText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.headerText h2 {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-weight: 600;
+  font-size: 26px;
+  color: var(--text-primary);
+}
+
+.headerText p {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.closeButton {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: none;
+  color: var(--icon-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.closeButton:hover {
+  color: var(--icon-active);
+  background: var(--button-background);
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 32px 20px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--line-default);
+  margin-bottom: 20px;
+}
+
+.release {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.releaseHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.version {
+  font-family: var(--font-family-base);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.date {
+  font: var(--font-caption);
+  color: var(--text-tertiary);
+}
+
+.entries {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.entry {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gap-lg);
+}
+
+.entryTag {
+  width: 84px;
+  flex-shrink: 0;
+  display: flex;
+}
+
+.entryText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.entryTitle {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.entryDescription {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--text-secondary);
+}
+
+.entryAction {
+  flex-shrink: 0;
+  height: 28px;
+  padding: 0 var(--padding-xl);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-default);
+  background: transparent;
+  color: var(--text-primary);
+  font: var(--font-body-md);
+  transition: background-color 0.15s ease;
+}
+
+.entryAction:hover {
+  background: var(--button-background);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px var(--padding-sm);
+  border-radius: var(--radius-full);
+  font: var(--font-caption);
+  white-space: nowrap;
+}
+
+.tagSuccess {
+  background: var(--field-background-success);
+  border: 1px solid var(--field-stroke-success);
+  color: var(--text-success);
+}
+
+.tagBrand {
+  background: var(--alpha-brand-10);
+  color: var(--brand-500);
+}
+
+.tagNeutral {
+  background: var(--button-background);
+  color: var(--text-primary);
+}
+
+.tagOutline {
+  border: 1px solid var(--field-stroke);
+  color: var(--text-tertiary);
+}
+
+.footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+  padding: 20px 32px 24px;
+  border-top: 1px solid var(--line-default);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--icon-success);
+  font: var(--font-caption);
+}
+
+.status span {
+  color: var(--text-tertiary);
+}
+
+.changelogLink {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: var(--font-label-sm);
+  color: var(--blue-500);
+  text-decoration: none;
+}
+
+.changelogLink:hover {
+  text-decoration: underline;
+}

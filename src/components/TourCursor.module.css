@@ -1,0 +1,30 @@
+.cursor {
+  position: fixed;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  margin-top: -9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, #fdf9ef 55%, #e8e2d3 100%);
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.4),
+    0 0 0 5px rgba(253, 249, 239, 0.12);
+  pointer-events: none;
+  z-index: 500;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    left 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    top 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.25s ease,
+    transform 0.18s ease;
+}
+
+.cursor[data-visible='true'] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.cursor[data-tapping='true'] {
+  transform: scale(0.62);
+}

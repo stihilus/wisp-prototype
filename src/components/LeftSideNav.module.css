@@ -1,0 +1,476 @@
+.nav {
+  width: 262px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  transition: width 0.22s ease;
+}
+
+.nav[data-open='false'] {
+  width: 64px;
+}
+
+.inner {
+  width: 262px;
+  height: 100%;
+  padding: var(--padding-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+  box-sizing: border-box;
+}
+
+.collapsedInner {
+  width: 64px;
+  height: 100%;
+  padding: var(--padding-lg);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.collapsedTop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-lg);
+}
+
+.collapsedBottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-md);
+}
+
+/* 32px circular rail buttons — Home / Chat */
+.railButton {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--icon-primary);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.railButton:hover {
+  color: var(--icon-active);
+  background: var(--field-background);
+}
+
+.railButton[data-active='true'] {
+  color: var(--icon-active);
+  background: var(--button-background);
+}
+
+/* tooltips open to the right of the rail */
+.railButton[data-tooltip]::after,
+.wsChip[data-tooltip]::after,
+.wsChipSmall[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  background: var(--field-background);
+  color: var(--text-primary);
+  font: var(--font-label-sm);
+  white-space: nowrap;
+  padding: 10px 18px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-dropdown);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
+  z-index: 20;
+}
+
+.wsChipSmall[data-tooltip]::after {
+  left: 50%;
+  top: auto;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%) translateY(4px);
+}
+
+.railButton[data-tooltip]:hover::after,
+.wsChip[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.wsChipSmall[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-family-base);
+  font-weight: 700;
+  line-height: 1;
+  color: #100f0d;
+}
+
+.wsChip {
+  position: relative;
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.wsChip:hover {
+  box-shadow: 0 0 0 2px var(--button-stroke-active);
+}
+
+.railDivider {
+  width: 16px;
+  height: 1px;
+  background: var(--line-default);
+  margin: 4px 0;
+}
+
+.switcher {
+  width: 260px;
+}
+
+.switcherLabel {
+  padding: 8px 10px 6px;
+}
+
+.switcherForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+}
+
+.switcherTitle {
+  margin: 0;
+  font: 600 14px/1.3 var(--font-family-base);
+  color: var(--text-primary);
+}
+
+.switcherSub {
+  margin: 4px 0 0;
+  font: 500 10px/1.4 var(--font-family-base);
+  color: var(--text-tertiary);
+}
+
+.wsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wsChips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wsChipSmall {
+  position: relative;
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.6;
+  transition:
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.wsChipSmall:hover {
+  opacity: 1;
+}
+
+.wsChipSmall[data-active='true'] {
+  opacity: 1;
+  box-shadow:
+    0 0 0 2px var(--background-primary),
+    0 0 0 3px var(--button-stroke-active);
+}
+
+.wsAdd {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px dashed var(--button-stroke-active);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--icon-primary);
+  cursor: pointer;
+}
+
+.wsAdd:hover {
+  color: var(--icon-active);
+  border-color: var(--text-tertiary);
+}
+
+.top {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.primaryRow {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+  padding-bottom: var(--padding-md);
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.primaryLabel {
+  font: var(--font-body-md);
+  color: var(--text-secondary);
+}
+
+.primaryRow:hover .primaryLabel,
+.primaryRow[data-active='true'] .primaryLabel {
+  color: var(--text-primary);
+}
+
+.primaryRow[data-active='true'] .rowIcon {
+  color: var(--icon-active);
+}
+
+.rowIcon {
+  color: var(--icon-primary);
+}
+
+.divider {
+  height: 1px;
+  width: 100%;
+  background: var(--line-default);
+  flex-shrink: 0;
+}
+
+.history {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--padding-xl);
+  margin: 0 -8px;
+  padding: 0 8px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+}
+
+.sectionTitle {
+  margin: 0;
+  font: var(--font-label-sm);
+  color: var(--text-tertiary);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+}
+
+.historyRow {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 3px 4px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.historyRow:hover {
+  background: var(--button-background);
+}
+
+.rowLabel {
+  flex: 1;
+  min-width: 0;
+  font: var(--font-body-md);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.historyRow:hover .rowLabel {
+  color: var(--text-primary);
+}
+
+.folderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+}
+
+.folderActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: width 0.15s ease, opacity 0.15s ease;
+}
+
+.historyRow:hover .folderActions {
+  width: 42px;
+  opacity: 1;
+}
+
+.folderActionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: none;
+  color: var(--icon-primary);
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.folderActionButton:hover {
+  color: var(--icon-active);
+  background: var(--field-stroke);
+}
+
+.folderChevron {
+  color: var(--icon-primary);
+  transition: transform 0.15s ease;
+}
+
+.folderChevronCollapsed {
+  transform: rotate(-90deg);
+}
+
+.nestedRows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+}
+
+.nestedRow {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 3px 4px 3px 28px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+}
+
+.nestedRow:hover {
+  background: var(--button-background);
+}
+
+.nestedRow:hover .rowLabel {
+  color: var(--text-primary);
+}
+
+.footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+}
+
+.footerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xs);
+}
+
+.profileIconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--padding-sm);
+  border-radius: var(--radius-full);
+  color: var(--icon-primary);
+}
+
+.username {
+  font: 400 12px var(--font-family-base);
+  color: var(--text-tertiary);
+}
+
+.footerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xs);
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--padding-sm);
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: none;
+  color: var(--icon-primary);
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.iconButton:hover {
+  color: var(--icon-active);
+  background: var(--button-background);
+}
+
+.memoryButton {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.footerRow:hover .memoryButton {
+  opacity: 1;
+}

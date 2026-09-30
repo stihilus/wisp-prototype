@@ -1,0 +1,17 @@
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+/* Force the inlined SVG to fill the requested box regardless of its own
+   intrinsic width/height attributes (Figma exports bake in the size of
+   whatever frame it was exported from, which doesn't always match how
+   we reuse the icon elsewhere). */
+.icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}

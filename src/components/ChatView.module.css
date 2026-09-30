@@ -1,0 +1,155 @@
+.chatView {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.messages {
+  width: 600px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-lg);
+  padding: 40px 24px 24px;
+}
+
+.wispBubble {
+  font: var(--font-body-md);
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.userBubble {
+  background: var(--chat-bubble-user);
+  border-radius: var(--radius-xl);
+  padding: var(--padding-lg);
+  font: var(--font-body-md);
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  line-height: 1.5;
+  align-self: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.toolCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-md);
+  height: 52px;
+  padding: 0 var(--padding-lg);
+  background: var(--field-background);
+  border: 1px solid var(--field-stroke);
+  border-radius: var(--radius-full);
+  box-sizing: border-box;
+  color: var(--icon-primary);
+}
+
+.toolCardLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+  min-width: 0;
+  flex: 1;
+}
+
+.toolCardText {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  font: var(--font-body-md);
+  color: var(--text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toolCardText span {
+  color: var(--text-secondary);
+}
+
+.dock {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 24px var(--padding-md);
+}
+
+.dockInner {
+  width: 600px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--padding-xl);
+}
+
+.contextCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px 10px 10px;
+  border: 1px solid var(--field-stroke);
+  border-radius: var(--radius-md);
+  background: var(--field-background);
+  animation: contextIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes contextIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+.contextLogos {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.contextLogo + .contextLogo {
+  margin-left: -6px;
+  box-shadow: 0 0 0 2px var(--field-background);
+}
+
+.contextText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contextTitle {
+  font: 500 12px/1.3 var(--font-family-base);
+  color: var(--text-primary);
+}
+
+.contextDetail {
+  font: 500 12px/1.4 var(--font-family-base);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contextBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  font: 500 10px/1 var(--font-family-base);
+  color: var(--text-tertiary);
+}

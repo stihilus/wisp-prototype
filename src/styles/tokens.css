@@ -1,0 +1,148 @@
+/*
+  Wisp design tokens — pulled from the design file's variable definitions.
+  Only dark-mode values exist in the source file today, so the light theme
+  below is a provisional palette built from the same semantic slots. Swap
+  the `[data-theme="light"]` block for real values once light frames exist
+  in Figma.
+*/
+
+:root {
+  /* structural tokens — theme independent */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  --gap-xs: 4px;
+  --gap-sm: 8px;
+  --gap-md: 12px;
+  --gap-lg: 16px;
+
+  --padding-xs: 4px;
+  --padding-sm: 8px;
+  --padding-md: 12px;
+  --padding-lg: 16px;
+  --padding-xl: 24px;
+  --padding-2xl: 32px;
+
+  --font-family-base: 'Noto Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-family-display: 'Ascella Pixel', ui-serif, Georgia, 'Times New Roman', serif;
+
+  --font-caption: 500 10px/1 var(--font-family-base);
+  --font-label-sm: 500 12px/1 var(--font-family-base);
+  --font-body-md: 500 14px/1.4 var(--font-family-base);
+
+  --shadow-dropdown: 0px 8px 12px rgba(0, 0, 0, 0.35);
+  --shadow-cta-glow: 0px 0px 3.5px rgba(255, 193, 109, 0.4);
+  --shadow-popover: 0px 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-drag: 0px 24px 48px rgba(0, 0, 0, 0.55);
+
+  --brand-500: #ffc16d;
+  --blue-500: #6c93ff;
+  --alpha-brand-10: rgba(255, 193, 109, 0.1);
+  --alpha-brand-20: rgba(255, 193, 109, 0.2);
+}
+
+/* ---------- dark theme (default, matches Figma source) ---------- */
+:root,
+:root[data-theme='dark'] {
+  --background-primary: #100f0d;
+
+  --text-primary: #fdf9ef;
+  --text-secondary: #c0baab;
+  --text-tertiary: #6f6c69;
+  --text-on-accent: #100f0d;
+  --text-success: #4bde80;
+  --text-danger: #ff5151;
+
+  --icon-primary: #6f6c69;
+  --icon-active: #e8e2d3;
+  --icon-success: #4bde80;
+  --icon-danger: #ff5151;
+
+  --field-background: #181614;
+  --field-background-chat: #181614;
+  --field-background-success: #1d2a21;
+  --field-stroke: #2d2a27;
+  --field-stroke-success: #4bde80;
+
+  --background-gradient-top: #1a1611;
+
+  --input-background: #181614;
+  --input-stroke: #3a3835;
+
+  --line-default: #2d2a27;
+
+  --button-background: #2d2a27;
+  --button-background-cta: #ffc16d;
+  --button-background-invert: #e8e2d3;
+  --button-stroke: #2d2a27;
+  --button-stroke-active: #3a3835;
+
+  --text-invert: #100f0d;
+  --text-brand: #ffc16d;
+
+  --chat-bubble-user: #2d2a27;
+
+  --sand-300: #c0baab;
+  --sand-950: #100f0d;
+
+  --scrollbar-thumb: #3a3835;
+  --scrollbar-track: transparent;
+
+  --backdrop: rgba(8, 7, 6, 0.55);
+
+  color-scheme: dark;
+}
+
+/* ---------- light theme (provisional — not sourced from Figma) ---------- */
+:root[data-theme='light'] {
+  --background-primary: #faf7f0;
+
+  --text-primary: #17140f;
+  --text-secondary: #4b4740;
+  --text-tertiary: #8c8579;
+  --text-on-accent: #100f0d;
+  --text-success: #1a8f4c;
+  --text-danger: #d13c3c;
+
+  --icon-primary: #8c8579;
+  --icon-active: #17140f;
+  --icon-success: #2fae64;
+  --icon-danger: #e14b4b;
+
+  --field-background: #ffffff;
+  --field-background-chat: #f4efe3;
+  --field-background-success: #e3f3e8;
+  --field-stroke: #e6e0d0;
+  --field-stroke-success: #2fae64;
+
+  --background-gradient-top: #fdfbf4;
+
+  --input-background: #ffffff;
+  --input-stroke: #ddd5c2;
+
+  --line-default: #e6e0d0;
+
+  --button-background: #efe9db;
+  --button-background-cta: #ffc16d;
+  --button-background-invert: #17140f;
+  --button-stroke: #e6e0d0;
+  --button-stroke-active: #d4ccb9;
+
+  --text-invert: #faf7f0;
+  --text-brand: #b27a1a;
+
+  --chat-bubble-user: #efe9db;
+
+  --sand-300: #8c8579;
+  --sand-950: #100f0d;
+
+  --scrollbar-thumb: #ddd5c2;
+  --scrollbar-track: transparent;
+
+  --backdrop: rgba(40, 34, 24, 0.28);
+
+  color-scheme: light;
+}

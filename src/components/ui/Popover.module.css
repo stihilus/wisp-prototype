@@ -1,0 +1,40 @@
+.popover {
+  position: fixed;
+  z-index: 60;
+  background: var(--input-background);
+  border: 1px solid var(--button-stroke);
+  border-radius: 12px;
+  box-shadow: var(--shadow-popover);
+  box-sizing: border-box;
+  opacity: 0;
+}
+
+.popover[data-ready='true'] {
+  animation: popIn 0.16s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.popover[data-placement^='top'][data-ready='true'] {
+  animation-name: popInUp;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes popInUp {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

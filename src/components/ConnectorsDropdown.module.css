@@ -1,0 +1,138 @@
+.dropdown {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: -40px;
+  width: 359px;
+  background: var(--field-background);
+  border: 1px solid var(--field-stroke);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-dropdown);
+  padding: var(--padding-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  z-index: 30;
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+  padding: 6px var(--padding-sm);
+  border-radius: var(--radius-full);
+}
+
+.muted {
+  color: var(--icon-primary);
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  flex: 1;
+  font: var(--font-body-md);
+  color: var(--text-primary);
+}
+
+.searchInput::placeholder {
+  color: var(--text-tertiary);
+}
+
+.divider {
+  height: 1px;
+  background: var(--line-default);
+  margin: 2px 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  padding: var(--padding-xs) var(--padding-sm);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  width: 100%;
+}
+
+.row:hover {
+  background: var(--button-background);
+}
+
+.service {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+}
+
+.logoChip {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  background: var(--button-background);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.logoImg {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.serviceName {
+  font: var(--font-body-md);
+  color: var(--text-primary);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xs);
+  font: var(--font-body-md);
+  color: var(--text-success);
+}
+
+.connectLabel {
+  font: var(--font-body-md);
+  color: var(--text-tertiary);
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+  padding: var(--padding-xs) var(--padding-sm);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font: var(--font-body-md);
+  color: var(--text-secondary);
+}
+
+.actionRow:hover {
+  background: var(--button-background);
+}
+
+.actionIcon {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--icon-primary);
+}

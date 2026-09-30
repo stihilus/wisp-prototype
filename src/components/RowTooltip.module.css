@@ -1,0 +1,37 @@
+.tooltip {
+  position: fixed;
+  background: var(--field-background);
+  color: var(--text-primary);
+  font: var(--font-label-sm);
+  white-space: nowrap;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 10px 18px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-dropdown);
+  pointer-events: none;
+  z-index: 200;
+  animation: fadeIn 0.1s ease;
+}
+
+.tooltip[data-side='right'] {
+  transform: translateY(-50%);
+}
+
+.tooltip[data-side='left'] {
+  transform: translate(-100%, -50%);
+}
+
+.tooltip[data-side='top'] {
+  transform: translate(-50%, -100%);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

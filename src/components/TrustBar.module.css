@@ -1,0 +1,23 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xs);
+  font: var(--font-caption);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.item svg {
+  color: var(--icon-primary);
+}
+
+.pipe {
+  font: var(--font-caption);
+  color: var(--text-tertiary);
+}
