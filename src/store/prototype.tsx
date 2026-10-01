@@ -114,7 +114,7 @@ export function connectedElsewhere(workspaces: Workspace[], wsId: string, tool: 
   return workspaces.find((w) => w.id !== wsId && connectedTools(w).has(tool))
 }
 
-type AddOptions = { preset?: string; at?: { x: number; y: number }; scope?: string[]; silent?: boolean }
+type AddOptions = { preset?: string; prompt?: string; at?: { x: number; y: number }; scope?: string[]; silent?: boolean }
 
 function useProtoValue() {
   const [state, setState] = useState<ProtoState>(loadState)
@@ -181,6 +181,7 @@ function useProtoValue() {
             w: Math.min(size.w, GRID_COLS),
             h: size.h,
             scope: opts.scope,
+            prompt: opts.prompt,
             updatedAt: Date.now(),
           }
           return { ...ws, widgets: compact([...ws.widgets, widget]) }
@@ -189,7 +190,7 @@ function useProtoValue() {
       markFresh(id)
       if (!opts.silent) {
         const ws = stateRef.current.workspaces.find((w) => w.id === wsId)
-        toast(`${kindName(kind)} added to ${ws?.name ?? 'Home'}`)
+        toast(`${opts.prompt ? `Custom ${kindName(kind)} view` : kindName(kind)} added to ${ws?.name ?? 'Home'}`)
       }
       return id
     },

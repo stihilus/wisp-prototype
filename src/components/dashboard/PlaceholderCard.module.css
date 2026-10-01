@@ -173,6 +173,34 @@
   flex-shrink: 0;
 }
 
+/* Connect / Create / Browse only shows on hover (per Figma); it stays while
+   connecting, and keyboard focus or touch screens always get it */
+.footer .primary {
+  opacity: 0;
+  transform: translateY(3px);
+  pointer-events: none;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    background-color 0.15s ease;
+}
+
+.card:hover .primary,
+.card:focus-within .primary,
+.footer .primary[data-busy] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+@media (hover: none) {
+  .footer .primary {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+}
+
 .local {
   display: inline-flex;
   align-items: center;

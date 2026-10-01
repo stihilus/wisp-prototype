@@ -120,9 +120,10 @@ export function PlaceholderCard({ placeholder, size, connecting, onConnect, onHi
       <footer className={styles.footer}>
         <button
           type="button"
-          className={`${ui.btn} ${ui.btnSm} ${ui.btnSecondary}`}
+          className={`${ui.btn} ${ui.btnSm} ${ui.btnSecondary} ${styles.primary}`}
           onClick={placeholder.id === 'more' ? onBrowse : onConnect}
           disabled={connecting}
+          data-busy={connecting || undefined}
           data-no-drag
         >
           {connecting && <span className={ui.spinner} />}

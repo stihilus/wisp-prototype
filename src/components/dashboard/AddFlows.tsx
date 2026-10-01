@@ -3,15 +3,7 @@ import { Icon } from '../Icon'
 import { Modal } from '../ui/Modal'
 import { Popover } from '../ui/Popover'
 import { ToolLogo } from './ToolLogo'
-import {
-  checkIcon,
-  chevRightIcon,
-  circleCheckedIcon,
-  circleUncheckIcon,
-  closeIcon,
-  lockerIcon,
-  searchIcon,
-} from '../../assets/icons'
+import { chevRightIcon, circleCheckedIcon, circleUncheckIcon, lockerIcon, searchIcon } from '../../assets/icons'
 import {
   customMeta,
   customOrder,
@@ -19,7 +11,6 @@ import {
   telegramChats,
   toolOrder,
   tools,
-  type CustomKind,
   type ToolId,
   type WidgetKind,
   type Workspace,
@@ -112,108 +103,6 @@ export function AddWidgetMenu({ anchor, workspace, workspaces, onClose, onPick, 
         </button>
       </div>
     </Popover>
-  )
-}
-
-/* ------------------------------------------------ 10 · Add to … modal */
-
-type AddWidgetModalProps = {
-  workspace: Workspace
-  workspaces: Workspace[]
-  connecting: Record<string, boolean>
-  onClose: () => void
-  onAdd: (kind: WidgetKind, preset: string) => void
-  onRequest: (what: 'connector' | 'widget') => void
-}
-
-export function AddWidgetModal({ workspace, workspaces, connecting, onClose, onAdd, onRequest }: AddWidgetModalProps) {
-  const here = connectedTools(workspace)
-  const onLabel = `On ${workspace.name.toLowerCase()}`
-  const isOn = (kind: WidgetKind, preset: string) => workspace.widgets.some((w) => w.kind === kind && w.preset === preset)
-
-  const groups: { kind: 'custom' | ToolId; title: string; note?: string; rows: { kind: WidgetKind; preset: string; title: string; desc: string }[] }[] = [
-    {
-      kind: 'custom',
-      title: 'Custom widgets',
-      rows: customOrder.map((k: CustomKind) => ({ kind: k, preset: presets[k][0].id, title: customMeta[k].name, desc: presets[k][0].desc })),
-    },
-    ...toolOrder.map((tool) => {
-      const from = here.has(tool) ? undefined : connectedElsewhere(workspaces, workspace.id, tool)
-      return {
-        kind: tool,
-        title: tools[tool].name,
-        note: here.has(tool) ? undefined : from ? `Connected in ${from.name}` : 'Not connected yet',
-        rows: presets[tool].map((p) => ({ kind: tool as WidgetKind, preset: p.id, title: p.title, desc: p.desc })),
-      }
-    }),
-  ]
-
-  return (
-    <Modal onClose={onClose} width={600} label={`Add to ${workspace.name}`}>
-      <div className={styles.modalHead}>
-        <div className={styles.modalHeadText}>
-          <h2 className={styles.modalTitle}>Add to {workspace.name}</h2>
-          <p className={styles.modalSub}>
-            Ready-made views of your tools, plus custom widgets that combine them. Everything here stays in the {workspace.name} workspace.
-          </p>
-        </div>
-        <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
-          <Icon svg={closeIcon} size={16} />
-        </button>
-      </div>
-
-      <div className={`${styles.modalList} thin-scroll`}>
-        {groups.map((group) => (
-          <section key={group.kind} className={styles.group}>
-            <div className={styles.groupHead}>
-              <ToolLogo kind={group.kind} size={24} />
-              <span className={styles.groupTitle}>{group.title}</span>
-              {group.note && <span className={styles.groupNote}>{group.note}</span>}
-            </div>
-            {group.rows.map((row) => {
-              const on = isOn(row.kind, row.preset)
-              const busy = !!connecting[`${workspace.id}:${row.kind}`]
-              return (
-                <div key={`${row.kind}-${row.preset}`} className={styles.template}>
-                  <div className={styles.templateText}>
-                    <span className={styles.templateTitle}>{row.title}</span>
-                    <span className={styles.templateDesc}>{row.desc}</span>
-                  </div>
-                  {on ? (
-                    <span className={styles.onHome}>
-                      <Icon svg={checkIcon} size={14} />
-                      {onLabel}
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      className={`${ui.btn} ${ui.btnSecondary}`}
-                      onClick={() => onAdd(row.kind, row.preset)}
-                      disabled={busy}
-                    >
-                      {busy && <span className={ui.spinner} />}
-                      {busy ? 'Connecting…' : 'Add'}
-                    </button>
-                  )}
-                </div>
-              )
-            })}
-          </section>
-        ))}
-      </div>
-
-      <div className={styles.modalFooter}>
-        <span>
-          <span className={styles.muted}>Missing a tool?</span>{' '}
-          <button type="button" className={ui.link} onClick={() => onRequest('connector')}>
-            Request a connector
-          </button>
-        </span>
-        <button type="button" className={styles.footerLink} onClick={() => onRequest('widget')}>
-          Can’t find it? Request a widget
-        </button>
-      </div>
-    </Modal>
   )
 }
 

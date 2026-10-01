@@ -6,7 +6,8 @@ import { ToolLogo } from './ToolLogo'
 import { WidgetGrid } from './WidgetGrid'
 import { WidgetCard } from './WidgetCard'
 import { PlaceholderCard } from './PlaceholderCard'
-import { AddWidgetMenu, AddWidgetModal, ReuseModal, ScopeModal } from './AddFlows'
+import { AddWidgetMenu, ReuseModal, ScopeModal } from './AddFlows'
+import { AddWidgetModal } from './AddWidgetModal'
 import { AutoRefreshPopover } from './WidgetPopovers'
 import { WorkspaceNameForm } from './WorkspaceNameForm'
 import { addSmallIcon, chevSmallIcon, closeSmallIcon, dotsV2Icon, refreshIcon, sparkleBrandIcon } from '../../assets/icons'
@@ -37,13 +38,14 @@ const GAP = 16
 type Flow =
   | { type: 'menu' }
   | { type: 'modal' }
-  | { type: 'reuse'; tool: ToolId; from: Workspace; preset?: string; at?: { x: number; y: number } }
+  | { type: 'reuse'; tool: ToolId; from: Workspace; preset?: string; prompt?: string; at?: { x: number; y: number } }
   | {
       type: 'scope'
       tool: ToolId
       source: 'shared' | 'own'
       from?: Workspace
       preset?: string
+      prompt?: string
       at?: { x: number; y: number }
       widgetId?: string
       initial?: string[]
@@ -105,42 +107,39 @@ export function HomeDashboard() {
 
   /* ------------------------------------------------------------ adding */
 
-  const startAdd = (kind: WidgetKind, opts: { preset?: string; at?: { x: number; y: number } } = {}) => {
-    if (!isTool(kind)) {
-      actions.addWidget(ws.id, kind, { preset: opts.preset, at: opts.at })
-      return
-    }
-    if (here.has(kind)) {
-      actions.addWidget(ws.id, kind, { preset: opts.preset, at: opts.at })
+  const startAdd = (kind: WidgetKind, opts: { preset?: string; prompt?: string; at?: { x: number; y: number } } = {}) => {
+    const { preset, prompt, at } = opts
+    if (!isTool(kind) || here.has(kind)) {
+      actions.addWidget(ws.id, kind, { preset, prompt, at })
       return
     }
     const from = connectedElsewhere(state.workspaces, ws.id, kind)
     if (from) {
-      setFlow({ type: 'reuse', tool: kind, from, preset: opts.preset, at: opts.at })
+      setFlow({ type: 'reuse', tool: kind, from, preset, prompt, at })
       return
     }
-    actions.connectTool(ws.id, kind, { preset: opts.preset, at: opts.at })
+    actions.connectTool(ws.id, kind, { preset, prompt, at })
   }
 
   const onReuseContinue = (source: 'shared' | 'own') => {
     if (!flow || flow.type !== 'reuse') return
-    const { tool, from, preset, at } = flow
+    const { tool, from, preset, prompt, at } = flow
     if (tools[tool].scope) {
-      setFlow({ type: 'scope', tool, source, from: source === 'shared' ? from : undefined, preset, at })
+      setFlow({ type: 'scope', tool, source, from: source === 'shared' ? from : undefined, preset, prompt, at })
       return
     }
     setFlow(null)
     if (source === 'shared') {
-      actions.addWidget(ws.id, tool, { preset, at, silent: true })
+      actions.addWidget(ws.id, tool, { preset, prompt, at, silent: true })
       actions.toast(`${tools[tool].name} from ${from.name} added to ${ws.name}`)
     } else {
-      actions.connectTool(ws.id, tool, { preset, at })
+      actions.connectTool(ws.id, tool, { preset, prompt, at })
     }
   }
 
   const onScopeConfirm = (scope: string[]) => {
     if (!flow || flow.type !== 'scope') return
-    const { tool, source, from, preset, at, widgetId } = flow
+    const { tool, source, from, preset, prompt, at, widgetId } = flow
     setFlow(null)
     if (widgetId) {
       actions.updateWidget(ws.id, widgetId, { scope })
@@ -149,10 +148,10 @@ export function HomeDashboard() {
       return
     }
     if (source === 'shared') {
-      actions.addWidget(ws.id, tool, { preset, at, scope, silent: true })
+      actions.addWidget(ws.id, tool, { preset, prompt, at, scope, silent: true })
       actions.toast(`${tools[tool].name} added to ${ws.name} — ${from?.name ?? 'Home'} keeps its own list`)
     } else {
-      actions.connectTool(ws.id, tool, { preset, at, scope })
+      actions.connectTool(ws.id, tool, { preset, prompt, at, scope })
     }
   }
 
@@ -547,14 +546,8 @@ export function HomeDashboard() {
           workspaces={state.workspaces}
           connecting={connecting}
           onClose={() => setFlow(null)}
-          onAdd={(kind, preset) => {
-            if (isTool(kind) && !here.has(kind) && connectedElsewhere(state.workspaces, ws.id, kind)) {
-              startAdd(kind, { preset })
-              return
-            }
-            startAdd(kind, { preset })
-          }}
-          onRequest={request}
+          onAdd={(kind, preset, prompt) => startAdd(kind, { preset, prompt })}
+          onRequest={() => request('widget')}
         />
       )}
 
