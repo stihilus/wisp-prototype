@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { Icon } from './Icon'
 import { Popover } from './ui/Popover'
-import { chevSmallIcon } from '../assets/icons'
+import { chevSmallIcon, feedbackFilledIcon } from '../assets/icons'
 import { usePrototype, type Scenario } from '../store/prototype'
 import ui from './ui/controls.module.css'
 import styles from './PrototypeMenu.module.css'
@@ -30,7 +30,53 @@ export function PrototypeMenu() {
       {open && (
         <Popover anchor={ref.current} onClose={() => setOpen(false)} placement="bottom-end" offset={8} className={styles.popover}>
           <div className={ui.menu}>
-            <span className={`${ui.sectionLabel} ${styles.label}`}>Jump {activeWorkspace.name} to</span>
+            <span className={`${ui.sectionLabel} ${styles.label}`}>Onboarding</span>
+            <button
+              type="button"
+              className={ui.menuItem}
+              onClick={() => {
+                setOpen(false)
+                actions.openWelcome()
+              }}
+            >
+              <span className={styles.step}>1st</span>
+              <span className={styles.text}>
+                <span className={styles.title}>First launch — Welcome</span>
+                <span className={styles.desc}>Welcome screen and the 5-step intro, on a fresh chat</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              className={ui.menuItem}
+              onClick={() => {
+                setOpen(false)
+                actions.startTour()
+              }}
+            >
+              <span className={styles.step}>2nd</span>
+              <span className={styles.text}>
+                <span className={styles.title}>Second launch — Feature tips</span>
+                <span className={styles.desc}>Step-by-step tips: model, Thinking, Projects, connectors…</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              className={ui.menuItem}
+              onClick={() => {
+                setOpen(false)
+                actions.nudgeReport()
+              }}
+            >
+              <span className={styles.step}>
+                <Icon svg={feedbackFilledIcon} size={12} />
+              </span>
+              <span className={styles.text}>
+                <span className={styles.title}>Report nudge</span>
+                <span className={styles.desc}>Pulse the Report button and pop a short hint</span>
+              </span>
+            </button>
+            <div className={ui.menuDivider} />
+            <span className={`${ui.sectionLabel} ${styles.label}`}>Dashboard · jump {activeWorkspace.name} to</span>
             {scenarios.map((s, i) => (
               <button
                 key={s.id}
@@ -60,7 +106,7 @@ export function PrototypeMenu() {
               <span className={styles.step}>↺</span>
               <span className={styles.text}>
                 <span className={styles.title}>Reset prototype</span>
-                <span className={styles.desc}>Clears everything saved in this browser</span>
+                <span className={styles.desc}>Starts over like a fresh install — welcome included</span>
               </span>
             </button>
             <p className={styles.note}>Your layout, widgets and workspaces are saved in this browser (localStorage).</p>

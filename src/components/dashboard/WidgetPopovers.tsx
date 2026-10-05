@@ -40,10 +40,12 @@ export function WidgetMenu({ anchor, widget, workspaceName, onClose, onRefresh, 
           <span className={ui.badgeBrand}>Starter</span>
           <span className={ui.switch} data-on="false" />
         </button>
-        {scope && onChooseScope && (
+        {(scope || widget.kind === 'news') && onChooseScope && (
           <button type="button" className={ui.menuItem} onClick={onChooseScope} role="menuitem">
             <Icon svg={slidersIcon} size={14} />
-            <span className={ui.menuLabel}>Choose {scope.unit === 'chats' ? 'chats' : 'labels'}…</span>
+            <span className={ui.menuLabel}>
+              {widget.kind === 'news' ? 'Edit sources…' : `Choose ${scope?.unit === 'chats' ? 'chats' : 'labels'}…`}
+            </span>
           </button>
         )}
         <button type="button" className={ui.menuItem} onClick={onChange} role="menuitem">

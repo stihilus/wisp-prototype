@@ -1,5 +1,5 @@
 import { Icon } from '../Icon'
-import { addSmallIcon, sparkleBrandIcon } from '../../assets/icons'
+import { addSmallIcon, globeIcon, sparkleBrandIcon } from '../../assets/icons'
 import {
   logoDrive,
   logoGmailAlt,
@@ -33,6 +33,14 @@ export function ToolLogo({ kind, size = 24, className }: { kind: LogoKind; size?
   const mark = marks[kind]
   const radius = Math.round(size / 4)
   const tileStyle = { width: size, height: size, borderRadius: radius }
+
+  if (kind === 'news') {
+    return (
+      <span className={`${styles.tile} ${styles.news} ${className ?? ''}`} style={tileStyle} aria-hidden>
+        <Icon svg={globeIcon} size={Math.round(size * 0.6)} />
+      </span>
+    )
+  }
 
   if (!mark) {
     const isMore = kind === 'more'

@@ -39,7 +39,9 @@
 }
 
 .step {
-  width: 20px;
+  min-width: 20px;
+  padding: 0 4px;
+  box-sizing: border-box;
   height: 20px;
   flex-shrink: 0;
   display: inline-flex !important;

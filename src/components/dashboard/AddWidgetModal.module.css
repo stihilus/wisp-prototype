@@ -194,6 +194,10 @@
   color: var(--text-success);
 }
 
+.status[data-new] {
+  color: var(--text-brand);
+}
+
 .cardTitle {
   margin: 0;
   font: 600 16px/1.3 var(--font-family-base);

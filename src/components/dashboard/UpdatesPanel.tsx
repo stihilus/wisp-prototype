@@ -8,7 +8,7 @@ import ui from '../ui/controls.module.css'
 import styles from './UpdatesPanel.module.css'
 
 // What needs you first — time-bound things lead, dashboards trail.
-const priority: WidgetKind[] = ['calendar', 'granola', 'telegram', 'gmail', 'summary', 'topic', 'linear', 'notion', 'drive', 'posthog', 'health', 'chart']
+const priority: WidgetKind[] = ['calendar', 'granola', 'telegram', 'gmail', 'summary', 'topic', 'news', 'linear', 'notion', 'drive', 'posthog', 'health', 'chart']
 
 export function UpdatesPanel({ now }: { now: number }) {
   const { state, activeWorkspace: ws, actions, refreshing } = usePrototype()

@@ -13,7 +13,7 @@ import {
   refreshIcon,
   resizeHandleIcon,
 } from '../../assets/icons'
-import { isTool, kindName, presetFor, relativeTime, widgetContent, type Widget, type WidgetKind } from '../../data/dashboard'
+import { isTool, kindName, presetFor, relativeTime, sourcesLabel, widgetContent, type Widget, type WidgetKind } from '../../data/dashboard'
 import { usePrototype } from '../../store/prototype'
 import ui from '../ui/controls.module.css'
 import styles from './WidgetCard.module.css'
@@ -42,6 +42,8 @@ export function WidgetCard({ widget, wsId, wsName, size, variant = 'grid', now =
   const { state, actions, refreshing } = usePrototype()
   const [panel, setPanel] = useState<Panel>(null)
   const [range, setRange] = useState('Last 30 days')
+  // News: while a story is open inside the widget, its own actions replace the footer
+  const [storyOpen, setStoryOpen] = useState(false)
   const menuRef = useRef<HTMLButtonElement>(null)
   const rangeRef = useRef<HTMLButtonElement>(null)
 
@@ -57,6 +59,15 @@ export function WidgetCard({ widget, wsId, wsName, size, variant = 'grid', now =
   const ask = () => actions.askWisp(widget)
 
   const onRowAction = (label: string, detail: string) => {
+    if (widget.kind === 'news' && !addsToChat) {
+      actions.askWisp(
+        widget,
+        `Tell me more about “${label}”`,
+        `Here’s the short version:\n\n${detail}\n\nWant me to pull in the full article, or compare it with how others covered it?`,
+        label,
+      )
+      return
+    }
     if (addsToChat) {
       actions.addContext(
         [widget.kind],
@@ -85,6 +96,7 @@ export function WidgetCard({ widget, wsId, wsName, size, variant = 'grid', now =
         <span className={styles.name}>
           {headerName(widget, source)}
           {widget.kind === 'posthog' && <span className={styles.nameSuffix}> · usewisp.io</span>}
+          {widget.kind === 'news' && <span className={styles.nameSuffix}> · {sourcesLabel(widget.sources)}</span>}
         </span>
         <span className={styles.spacer} />
 
@@ -100,7 +112,7 @@ export function WidgetCard({ widget, wsId, wsName, size, variant = 'grid', now =
             Private
           </span>
         )}
-        {!feed && custom && <span className={ui.badgeBrand}>Custom</span>}
+        {!feed && custom && widget.kind !== 'news' && <span className={ui.badgeBrand}>Custom</span>}
 
         {feed ? (
           <>
@@ -143,6 +155,8 @@ export function WidgetCard({ widget, wsId, wsName, size, variant = 'grid', now =
           variant={variant}
           rowActionLabel={addsToChat ? 'Add to this chat' : 'Ask Wisp'}
           onRowAction={onRowAction}
+          onNotice={actions.toast}
+          onDetailChange={setStoryOpen}
           onToggleTodo={(id) => {
             const done = widget.done ?? []
             actions.updateWidget(wsId, widget.id, { done: done.includes(id) ? done.filter((d) => d !== id) : [...done, id] })
@@ -150,7 +164,7 @@ export function WidgetCard({ widget, wsId, wsName, size, variant = 'grid', now =
         />
       </div>
 
-      <footer className={styles.footer}>
+      <footer className={styles.footer} hidden={storyOpen}>
         <button type="button" className={styles.cta} onClick={ask} data-no-drag>
           {content.cta}
           <Icon svg={arrowRightIcon} size={12} />

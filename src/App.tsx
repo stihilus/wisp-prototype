@@ -9,6 +9,8 @@ import { NewsModal } from './components/NewsModal'
 import { HomeDashboard } from './components/dashboard/HomeDashboard'
 import { UpdatesPanel } from './components/dashboard/UpdatesPanel'
 import { Toasts } from './components/ui/Toasts'
+import { WelcomeModal } from './components/onboarding/WelcomeModal'
+import { FeatureTour } from './components/onboarding/FeatureTour'
 import { useTheme } from './hooks/useTheme'
 import { usePrototype } from './store/prototype'
 import backgroundDark from './assets/bg/background-dark.svg'
@@ -27,7 +29,7 @@ function useNow(interval = 20000) {
 
 function App() {
   const { theme, toggleTheme } = useTheme()
-  const { state, actions } = usePrototype()
+  const { state, actions, overlay } = usePrototype()
   const [activePanel, setActivePanel] = useState<PanelKey | null>(null)
   const [releaseModalOpen, setReleaseModalOpen] = useState(false)
   const [newsModalOpen, setNewsModalOpen] = useState(false)
@@ -122,6 +124,9 @@ function App() {
       )}
 
       {newsModalOpen && <NewsModal onClose={() => setNewsModalOpen(false)} onTryModel={handleTryModel} />}
+
+      {overlay === 'welcome' && <WelcomeModal />}
+      {overlay === 'tour' && <FeatureTour />}
 
       <Toasts />
     </div>

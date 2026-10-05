@@ -24,10 +24,10 @@ import styles from './AddWidgetModal.module.css'
 // "Add to …" — step 1 is a feed of preview cards (one per tool, plus Custom),
 // step 2 opens one of them: suggested views and a box to describe your own.
 
-type Group = ToolId | 'custom'
+type Group = ToolId | 'news' | 'custom'
 type Row = { kind: WidgetKind; preset: string; title: string; desc: string }
 
-const groups: Group[] = [...toolOrder, 'custom']
+const groups: Group[] = [...toolOrder, 'news', 'custom']
 
 const pitch: Record<Group, string> = {
   telegram: 'Catch up on the chats you skipped',
@@ -39,6 +39,7 @@ const pitch: Record<Group, string> = {
   drive: 'See what’s been shared with you',
   posthog: 'Watch traffic, downloads and sign-ups',
   health: 'Steps, sleep and heart rate at a glance',
+  news: 'Follow news on anything',
   custom: 'Build your own from a prompt',
 }
 
@@ -52,16 +53,24 @@ const promptExample: Record<Group, string> = {
   drive: 'e.g. Contracts shared with me this month',
   posthog: 'e.g. Sign-ups that came from /private-ai',
   health: 'e.g. How my sleep changes on gym days',
+  news: 'e.g. theverge.com, confidential computing, Anthropic',
   custom: 'e.g. A weekly chart of Gmail invoices next to Linear issues closed',
 }
 
 function groupName(group: Group) {
+  if (group === 'news') return 'News'
   return group === 'custom' ? 'Custom widget' : tools[group].name
 }
 
 function rowsFor(group: Group): Row[] {
+  if (group === 'news') {
+    return presets.news.map((p) => ({ kind: 'news' as WidgetKind, preset: p.id, title: p.title, desc: p.desc }))
+  }
   if (group === 'custom') {
-    return customOrder.map((k) => ({ kind: k, preset: presets[k][0].id, title: customMeta[k].name, desc: presets[k][0].desc }))
+    // News has its own card
+    return customOrder
+      .filter((k) => k !== 'news')
+      .map((k) => ({ kind: k, preset: presets[k][0].id, title: customMeta[k].name, desc: presets[k][0].desc }))
   }
   return presets[group].map((p) => ({ kind: group, preset: p.id, title: p.title, desc: p.desc }))
 }
@@ -96,8 +105,11 @@ export function AddWidgetModal({ workspace, workspaces, connecting, onClose, onA
     workspace.widgets.some((w) => w.kind === kind && w.preset === preset && !w.prompt)
 
   const status = (g: Group): { label: string; on: boolean } | null => {
+    if (g === 'news') {
+      return workspace.widgets.some((w) => w.kind === 'news') ? { label: 'Enabled', on: true } : { label: 'New', on: false }
+    }
     if (g === 'custom') {
-      const count = workspace.widgets.filter((w) => !isTool(w.kind)).length
+      const count = workspace.widgets.filter((w) => !isTool(w.kind) && w.kind !== 'news').length
       return count ? { label: `${count} enabled`, on: true } : null
     }
     if (here.has(g)) return { label: 'Enabled', on: true }
@@ -109,17 +121,24 @@ export function AddWidgetModal({ workspace, workspaces, connecting, onClose, onA
   const matchingRow = (g: Group) => (q ? rowsFor(g).find((r) => `${r.title} ${r.desc}`.toLowerCase().includes(q)) : undefined)
   const visible = groups.filter((g) => {
     if (!q) return true
-    const text = `${groupName(g)} ${pitch[g]} ${g === 'custom' ? '' : tools[g].blurb}`.toLowerCase()
+    const extra = g === 'custom' ? '' : g === 'news' ? 'websites topics companies headlines' : tools[g].blurb
+    const text = `${groupName(g)} ${pitch[g]} ${extra}`.toLowerCase()
     return text.includes(q) || !!matchingRow(g)
   })
 
   const openGroup = (g: Group) => {
+    // News is set up by telling Wisp what to follow, so it skips straight to that
+    if (g === 'news') {
+      onAdd('news', presets.news[0].id)
+      return
+    }
     setGroup(g)
     setDraft('')
   }
 
   const detailSub = (g: Group) => {
     if (g === 'custom') return 'Combine your tools into a chart, a digest or a topic to watch.'
+    if (g === 'news') return 'Websites, topics or companies — Wisp brings back what’s new.'
     if (here.has(g)) return `Enabled in ${workspace.name}. Add another view or describe your own.`
     const from = connectedElsewhere(workspaces, workspace.id, g)
     if (from) return `Connected in ${from.name} — you’ll choose what ${workspace.name} can see.`
@@ -188,10 +207,10 @@ export function AddWidgetModal({ workspace, workspaces, connecting, onClose, onA
                   }}
                 >
                   <div className={styles.cardHead}>
-                    <ToolLogo kind={g === 'custom' ? 'custom' : g} size={24} />
+                    <ToolLogo kind={g} size={24} />
                     <span className={styles.cardName}>{groupName(g)}</span>
                     {st && (
-                      <span className={styles.status} data-on={st.on}>
+                      <span className={styles.status} data-on={st.on} data-new={(g === 'news' && !st.on) || undefined}>
                         {st.on && <Icon svg={checkIcon} size={12} />}
                         {st.label}
                       </span>
@@ -200,7 +219,13 @@ export function AddWidgetModal({ workspace, workspaces, connecting, onClose, onA
                   <h3 className={styles.cardTitle}>{pitch[g]}</h3>
                   <Preview group={g} />
                   <div className={styles.cardFoot}>
-                    <span>{match ? `Matches “${match.title}”` : `${count} suggested views · or describe your own`}</span>
+                    <span>
+                      {match
+                        ? `Matches “${match.title}”`
+                        : g === 'news'
+                          ? 'Set up in seconds · pick sites, topics or companies'
+                          : `${count} suggested views · or describe your own`}
+                    </span>
                     <Icon svg={chevRightIcon} size={14} className={styles.cardChev} />
                   </div>
                 </div>

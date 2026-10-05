@@ -231,6 +231,7 @@ export function LeftSideNav({ open, view, onHome, onChat, onNewChat, onOpenChat 
               className={styles.railButton}
               data-active={view === 'home'}
               data-tooltip="Dashboard"
+              data-tour="dashboard"
               aria-label="Dashboard"
               onClick={onHome}
             >
@@ -255,6 +256,7 @@ export function LeftSideNav({ open, view, onHome, onChat, onNewChat, onOpenChat 
               ref={chipRef}
               type="button"
               className={styles.wsChip}
+              data-tour="workspaces"
               aria-label={`Workspace: ${activeWorkspace.name}`}
               data-tooltip={activeWorkspace.name}
               onClick={() => openSwitcher(chipRef.current, 'list')}
@@ -282,7 +284,7 @@ export function LeftSideNav({ open, view, onHome, onChat, onNewChat, onOpenChat 
     <aside className={styles.nav} data-open={open}>
       <div className={styles.inner}>
         <div className={styles.top}>
-          <button type="button" className={styles.primaryRow} data-active={view === 'home'} onClick={onHome}>
+          <button type="button" className={styles.primaryRow} data-active={view === 'home'} data-tour="dashboard" onClick={onHome}>
             <Icon svg={dashboardIcon} className={styles.rowIcon} />
             <span className={styles.primaryLabel}>Dashboard</span>
           </button>
@@ -304,7 +306,7 @@ export function LeftSideNav({ open, view, onHome, onChat, onNewChat, onOpenChat 
 
         <div className={styles.footer}>
           <div className={styles.wsRow}>
-            <div className={styles.wsChips}>
+            <div className={styles.wsChips} data-tour="workspaces">
               {state.workspaces.map((ws) => (
                 <button
                   key={ws.id}

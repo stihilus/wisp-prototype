@@ -130,3 +130,46 @@
   color: var(--text-primary);
   background: var(--button-background);
 }
+
+/* Thinking reads as a real toggle: filled chip when off, inverted when on */
+.thinking {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px 0 var(--padding-md);
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--button-background);
+  font: var(--font-body-md);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.thinking :global(svg) {
+  color: var(--icon-primary);
+  transition: color 0.18s ease;
+}
+
+.thinking:hover {
+  background: var(--button-stroke-active);
+  color: var(--text-secondary);
+}
+
+.thinking[data-on='true'] {
+  padding-right: var(--padding-md);
+  background: var(--button-background-invert);
+  color: var(--text-invert);
+}
+
+.thinking[data-on='true'] :global(svg) {
+  color: var(--text-invert);
+}
+
+.thinking[data-on='true']:hover {
+  filter: brightness(1.05);
+}

@@ -68,7 +68,7 @@ export function ChatInput({
             <button type="button" className={styles.circleButton} aria-label="Add attachment">
               <Icon svg={addIcon} />
             </button>
-            <button type="button" className={styles.pillButton}>
+            <button type="button" className={styles.pillButton} data-tour="project">
               <Icon svg={addFolderIcon} />
               Project
             </button>
@@ -78,12 +78,14 @@ export function ChatInput({
             <ModelPicker guidedTrigger={guidedModelTrigger} autoSelectModelId={autoSelectModelId} />
             <button
               type="button"
-              className={styles.pillButton}
-              data-active={thinking}
+              className={styles.thinking}
+              data-on={thinking}
+              aria-pressed={thinking}
+              data-tour="thinking"
               onClick={() => setThinking((v) => !v)}
             >
               <Icon svg={brainIcon} />
-              Thinking
+              Thinking: {thinking ? 'on' : 'off'}
             </button>
           </div>
         </div>

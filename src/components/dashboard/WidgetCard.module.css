@@ -211,6 +211,10 @@
   flex-shrink: 0;
 }
 
+.footer[hidden] {
+  display: none;
+}
+
 .cta {
   display: inline-flex;
   align-items: center;

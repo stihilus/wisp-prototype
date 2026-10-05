@@ -42,22 +42,31 @@ export type ProtoState = {
   workspaces: Workspace[]
   feedBadge: number
   chat: { started: boolean; messages: ChatMessage[] }
+  /** first-time experience: welcome on the first launch, feature tips on the second */
+  ftu: { visits: number; welcomeDone: boolean; tourDone: boolean }
 }
+
+export type Overlay = 'welcome' | 'tour' | null
 
 export type Toast = { id: number; text: string; actionLabel?: string; onAction?: () => void }
 
 function initialState(): ProtoState {
   return {
     version: VERSION,
-    view: 'home',
+    // a brand-new user lands on the familiar chat home, not the dashboard
+    view: 'chat',
     sidebarOpen: false,
     updatesOpen: false,
     activeWorkspaceId: 'home',
     workspaces: seedWorkspaces(),
     feedBadge: 4,
     chat: { started: false, messages: [] },
+    ftu: { visits: 0, welcomeDone: false, tourDone: false },
   }
 }
+
+// counts a "launch" once per browser session, so reloads don't look like new visits
+const SESSION_KEY = 'wisp-prototype-session'
 
 function loadState(): ProtoState {
   try {
@@ -114,7 +123,14 @@ export function connectedElsewhere(workspaces: Workspace[], wsId: string, tool: 
   return workspaces.find((w) => w.id !== wsId && connectedTools(w).has(tool))
 }
 
-type AddOptions = { preset?: string; prompt?: string; at?: { x: number; y: number }; scope?: string[]; silent?: boolean }
+type AddOptions = {
+  preset?: string
+  prompt?: string
+  at?: { x: number; y: number }
+  scope?: string[]
+  sources?: string[]
+  silent?: boolean
+}
 
 function useProtoValue() {
   const [state, setState] = useState<ProtoState>(loadState)
@@ -122,6 +138,9 @@ function useProtoValue() {
   const [connecting, setConnecting] = useState<Record<string, boolean>>({})
   const [freshIds, setFreshIds] = useState<Record<string, boolean>>({})
   const [refreshing, setRefreshing] = useState<Record<string, boolean>>({})
+  const [overlay, setOverlay] = useState<Overlay>(null)
+  /** bumps each time the Report button should pulse + show its hint */
+  const [reportNudge, setReportNudge] = useState(0)
   const chatTimers = useRef<number[]>([])
   const connectingRef = useRef<Record<string, boolean>>({})
   const stateRef = useRef(state)
@@ -182,6 +201,7 @@ function useProtoValue() {
             h: size.h,
             scope: opts.scope,
             prompt: opts.prompt,
+            sources: opts.sources,
             updatedAt: Date.now(),
           }
           return { ...ws, widgets: compact([...ws.widgets, widget]) }
@@ -421,10 +441,66 @@ function useProtoValue() {
     } catch {
       // ignore
     }
-    setState(initialState())
+    // a reset behaves like a fresh install: chat home + the welcome screen
+    setState({ ...initialState(), ftu: { visits: 1, welcomeDone: false, tourDone: false } })
     setToasts([])
-    toast('Prototype reset — everything is back to the first-run state')
-  }, [toast])
+    setOverlay('welcome')
+  }, [])
+
+  /* ------------------------------------------------- first-time experience */
+
+  /** the welcome sits on top of a clean chat home */
+  const openWelcome = useCallback(() => {
+    clearChatTimers()
+    setState((s) => ({ ...s, view: 'chat', updatesOpen: false, chat: { started: false, messages: [] } }))
+    setOverlay('welcome')
+  }, [])
+
+  /** done = Start chatting / X / finished the steps; later = "Remind me later" */
+  const closeWelcome = useCallback((outcome: 'done' | 'later') => {
+    setOverlay(null)
+    if (outcome === 'done') setState((s) => ({ ...s, ftu: { ...s.ftu, welcomeDone: true } }))
+  }, [])
+
+  /** draw attention to the Report button in the right rail */
+  const nudgeReport = useCallback(() => {
+    setState((s) => ({ ...s, updatesOpen: false }))
+    setReportNudge((n) => n + 1)
+  }, [])
+
+  const startTour = useCallback(() => {
+    setState((s) => ({ ...s, view: 'chat', updatesOpen: false }))
+    setOverlay('tour')
+  }, [])
+
+  const endTour = useCallback(() => {
+    setOverlay(null)
+    setState((s) => ({ ...s, ftu: { ...s.ftu, tourDone: true } }))
+  }, [])
+
+  // On a new browser session: 1st launch → welcome, 2nd launch → feature tips.
+  const launchChecked = useRef(false)
+  useEffect(() => {
+    if (launchChecked.current) return
+    launchChecked.current = true
+    let newSession = true
+    try {
+      newSession = !sessionStorage.getItem(SESSION_KEY)
+      sessionStorage.setItem(SESSION_KEY, '1')
+    } catch {
+      // storage blocked — treat every load as a new launch
+    }
+    if (!newSession) return
+    const { ftu } = stateRef.current
+    const visits = ftu.visits + 1
+    setState((s) => ({ ...s, ftu: { ...s.ftu, visits } }))
+    if (!ftu.welcomeDone) {
+      openWelcome()
+    } else if (visits >= 2 && !ftu.tourDone) {
+      // no cleanup on purpose — StrictMode's dev re-run would cancel it
+      window.setTimeout(startTour, 700)
+    }
+  }, [openWelcome, startTour])
 
   /* ---------------------------------------------------------- navigation */
 
@@ -486,7 +562,7 @@ function useProtoValue() {
 
   /** "Ask Wisp …" on a widget — opens a fresh chat with that widget as context */
   const askWisp = useCallback(
-    (widget: Widget, question?: string, reply?: string) => {
+    (widget: Widget, question?: string, reply?: string, contextDetail?: string) => {
       clearChatTimers()
       const content = widgetContent(widget)
       const kind = content.source ?? widget.kind
@@ -496,7 +572,7 @@ function useProtoValue() {
         chat: {
           started: true,
           messages: [
-            { id: nextId(), role: 'context', kinds: [kind], title: kindName(kind), detail: content.headline },
+            { id: nextId(), role: 'context', kinds: [kind], title: kindName(kind), detail: contextDetail ?? content.headline },
             { id: nextId(), role: 'user', text: question ?? content.cta },
           ],
         },
@@ -567,6 +643,11 @@ function useProtoValue() {
       askWisp,
       addContext,
       startChatWithContext,
+      openWelcome,
+      closeWelcome,
+      startTour,
+      endTour,
+      nudgeReport,
     }),
     // every action above is stable (useCallback over setters / refs)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -575,7 +656,7 @@ function useProtoValue() {
 
   const activeWorkspace = state.workspaces.find((w) => w.id === state.activeWorkspaceId) ?? state.workspaces[0]
 
-  return { state, activeWorkspace, actions, toasts, connecting, freshIds, refreshing }
+  return { state, activeWorkspace, actions, toasts, connecting, freshIds, refreshing, overlay, reportNudge }
 }
 
 type ProtoValue = ReturnType<typeof useProtoValue>

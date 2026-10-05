@@ -8,17 +8,19 @@
   align-items: center;
   gap: 6px;
   height: 32px;
-  padding: var(--padding-sm) 10px var(--padding-sm) 14px;
+  padding: 0 10px 0 var(--padding-md);
   border-radius: var(--radius-full);
-  background: transparent;
+  background: var(--button-background);
   border: none;
   font: var(--font-body-md);
   color: var(--text-primary);
+  white-space: nowrap;
+  cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
 .trigger:hover {
-  background: var(--button-background);
+  background: var(--button-stroke-active);
 }
 
 .panelsRow {

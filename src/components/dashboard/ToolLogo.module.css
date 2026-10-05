@@ -20,6 +20,11 @@
   color: var(--brand-500);
 }
 
+.news {
+  background: rgba(108, 147, 255, 0.18);
+  color: var(--blue-500);
+}
+
 .img {
   display: block;
   pointer-events: none;

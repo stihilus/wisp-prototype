@@ -1,0 +1,206 @@
+.tip {
+  position: fixed;
+  z-index: 70;
+  width: 288px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px 16px;
+  border: 1px solid var(--button-stroke-active);
+  border-radius: var(--radius-lg);
+  background: var(--field-background);
+  box-shadow: var(--shadow-popover);
+  box-sizing: border-box;
+  opacity: 0;
+}
+
+.tip[data-ready='true'] {
+  animation: tipIn 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.tip[data-ready='true'][data-placement='top'] {
+  --from: translateY(6px);
+}
+
+.tip[data-ready='true'][data-placement='bottom'] {
+  --from: translateY(-6px);
+}
+
+.tip[data-ready='true'][data-placement='left'] {
+  --from: translateX(6px);
+}
+
+.tip[data-ready='true'][data-placement='right'] {
+  --from: translateX(-6px);
+}
+
+@keyframes tipIn {
+  from {
+    opacity: 0;
+    transform: var(--from, none);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* small diamond pointing at the highlighted control */
+.arrow {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--field-background);
+  border: 1px solid var(--button-stroke-active);
+  box-sizing: border-box;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.tip[data-placement='top'] .arrow {
+  top: 100%;
+  border-top: none;
+  border-left: none;
+  margin-top: -0.5px;
+}
+
+.tip[data-placement='bottom'] .arrow {
+  top: 0;
+  border-bottom: none;
+  border-right: none;
+  margin-top: -0.5px;
+}
+
+.tip[data-placement='left'] .arrow {
+  left: 100%;
+  border-bottom: none;
+  border-left: none;
+}
+
+.tip[data-placement='right'] .arrow {
+  left: 0;
+  border-top: none;
+  border-right: none;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.counter {
+  font: 500 10px/1 var(--font-family-base);
+  letter-spacing: 0.4px;
+  color: var(--text-tertiary);
+}
+
+.close {
+  display: inline-flex;
+  padding: 3px;
+  margin: -3px -5px -3px 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--icon-primary);
+  cursor: pointer;
+}
+
+.close:hover {
+  color: var(--icon-active);
+  background: var(--button-background);
+}
+
+.title {
+  margin: 0;
+  font: 600 14px/1.3 var(--font-family-base);
+  color: var(--text-primary);
+}
+
+.body {
+  margin: 0;
+  font: 500 12px/1.5 var(--font-family-base);
+  color: var(--text-secondary);
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.progress {
+  display: flex;
+  gap: 3px;
+}
+
+.progress span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--button-stroke-active);
+  transition: background-color 0.2s ease;
+}
+
+.progress span[data-state='done'] {
+  background: var(--text-tertiary);
+}
+
+.progress span[data-state='current'] {
+  background: var(--brand-500);
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.back {
+  padding: 0 6px;
+  border: none;
+  background: none;
+  font: 500 12px/1 var(--font-family-base);
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+
+.back:hover {
+  color: var(--text-primary);
+}
+
+/* the control the tip is about gets a soft neutral halo (no yellow spotlight) */
+:global([data-tour-active]) {
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    0 0 0 1px rgba(253, 249, 239, 0.22),
+    0 0 0 5px rgba(253, 249, 239, 0.06);
+  animation: tourHalo 1.8s ease-in-out infinite;
+}
+
+@keyframes tourHalo {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(253, 249, 239, 0.22),
+      0 0 0 4px rgba(253, 249, 239, 0.05);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(253, 249, 239, 0.3),
+      0 0 0 7px rgba(253, 249, 239, 0.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tip[data-ready='true'] {
+    animation: none;
+    opacity: 1;
+  }
+  :global([data-tour-active]) {
+    animation: none;
+  }
+}

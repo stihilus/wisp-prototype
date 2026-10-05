@@ -14,9 +14,9 @@ export type ToolId =
   | 'posthog'
   | 'health'
 
-export type CustomKind = 'chart' | 'summary' | 'topic'
+export type CustomKind = 'news' | 'chart' | 'summary' | 'topic'
 export type WidgetKind = ToolId | CustomKind
-export type PlaceholderKind = 'telegram' | 'gmail' | 'calendar' | 'granola' | 'linear' | 'custom' | 'more'
+export type PlaceholderKind = 'telegram' | 'gmail' | 'news' | 'calendar' | 'granola' | 'linear' | 'custom' | 'more'
 
 export type Rect = { x: number; y: number; w: number; h: number }
 
@@ -29,6 +29,8 @@ export type Widget = Rect & {
   scope?: string[]
   /** Granola to-dos ticked off */
   done?: string[]
+  /** News: the websites, topics and companies Wisp follows */
+  sources?: string[]
   updatedAt?: number
 }
 
@@ -130,12 +132,13 @@ export const tools: Record<ToolId, ToolMeta> = {
 export const toolOrder: ToolId[] = ['telegram', 'gmail', 'calendar', 'granola', 'linear', 'notion', 'drive', 'posthog', 'health']
 
 export const customMeta: Record<CustomKind, { name: string; blurb: string; size: { w: number; h: number } }> = {
+  news: { name: 'News', blurb: 'Fresh stories from sites, topics and companies', size: { w: 1, h: 1 } },
   chart: { name: 'Chart', blurb: 'Numbers from any tool, over time', size: { w: 2, h: 1 } },
   summary: { name: 'Summary across tools', blurb: 'One digest from Telegram, Gmail and Calendar', size: { w: 2, h: 1 } },
   topic: { name: 'Watch a topic', blurb: 'Everything that mentions a client or project', size: { w: 1, h: 2 } },
 }
 
-export const customOrder: CustomKind[] = ['chart', 'summary', 'topic']
+export const customOrder: CustomKind[] = ['news', 'chart', 'summary', 'topic']
 
 export function isTool(kind: WidgetKind): kind is ToolId {
   return kind in tools
@@ -366,6 +369,22 @@ export const presets: Record<WidgetKind, Preset[]> = {
       prompt: 'On Mondays, list the deadlines and important meetings for the week, across all my tools.',
     },
   ],
+  news: [
+    {
+      id: 'latest',
+      chip: 'Latest stories',
+      title: 'News',
+      desc: 'Fresh stories from the sites, topics and companies you pick',
+      prompt: 'Find the newest stories about the sources I follow. Five a day, newest first, one line each.',
+    },
+    {
+      id: 'digest',
+      chip: 'Morning digest',
+      title: 'Morning news digest',
+      desc: 'One short summary of what changed overnight',
+      prompt: 'Every morning at 8:00, summarise what changed overnight for the sources I follow, in three lines.',
+    },
+  ],
   topic: [
     {
       id: 'lido',
@@ -403,6 +422,16 @@ export type ChatItem = {
 }
 
 export type RowItem = { title: string; sub: string; meta?: string }
+export type NewsItem = {
+  id: string
+  source: string
+  time: string
+  title: string
+  summary: string
+  /** Wisp's key points, shown when the story is opened inside the widget */
+  points: string[]
+  tag?: string
+}
 export type DigestItem = { tool: WidgetKind; text: string }
 
 export type WidgetBodySpec =
@@ -416,6 +445,7 @@ export type WidgetBodySpec =
   | { type: 'vitals' }
   | { type: 'bars'; value: string; valueSub: string; values: number[]; labels?: string[] }
   | { type: 'digest'; items: DigestItem[] }
+  | { type: 'news'; items: NewsItem[]; label: string }
 
 export type WidgetContent = {
   /** header name override (custom widgets name their source) */
@@ -874,6 +904,19 @@ export function widgetContent(widget: Widget): WidgetContent {
       }
     }
 
+    case 'news': {
+      const items = newsFor(widget.sources)
+      const label = sourcesLabel(widget.sources)
+      const digest = preset === 'digest'
+      return {
+        headline: digest ? 'Overnight, in three lines' : `${items.length} new stories`,
+        sub: label,
+        body: { type: 'news', items: digest ? items.slice(0, 3) : items, label },
+        cta: 'Ask Wisp what matters here',
+        reply: `Two stories are worth your time:\n\n• ${items[0].title}\n• ${items[1].title}\n\nThe rest repeat what you already know. Want a three-line summary of each?`,
+      }
+    }
+
     case 'topic': {
       if (preset === 'meridian') {
         return {
@@ -911,6 +954,134 @@ export function widgetContent(widget: Widget): WidgetContent {
   }
 }
 
+/* -------------------------------------------------------------------- news */
+
+// What a News widget shows before the user picks anything (and in previews).
+const newsPool: NewsItem[] = [
+  {
+    id: 'n1',
+    source: 'The Verge',
+    time: '12 min ago',
+    title: 'Apple opens its on-device models to third-party apps',
+    summary: 'Developers can now run Apple’s private models locally — no data leaves the phone.',
+    points: [
+      'Third-party apps can call Apple’s on-device models through a new API, with no cloud round-trip.',
+      'Requests never leave the phone, so apps don’t need a separate AI privacy policy.',
+      'In the beta today; everyone gets it with the autumn update.',
+    ],
+  },
+  {
+    id: 'n2',
+    source: 'Protocol Watch',
+    time: '1h ago',
+    title: 'Lido v3 audit is out — no critical findings',
+    summary: 'Two medium issues, both already fixed in the release candidate shipping next week.',
+    points: [
+      'Two medium-severity issues were found and both are fixed in the release candidate.',
+      'No critical or high findings in the staking router or the withdrawal queue.',
+      'Mainnet deployment is planned for next Tuesday, after a final community vote.',
+    ],
+  },
+  {
+    id: 'n3',
+    source: 'Politico',
+    time: '3h ago',
+    title: 'What the EU AI Act changes for AI assistants in 2027',
+    summary: 'Transparency rules land first; private, on-device assistants get lighter obligations.',
+    points: [
+      'Assistants must say clearly when content is AI-generated — that rule applies first.',
+      'Private, on-device assistants fall under lighter obligations than cloud chatbots.',
+      'Fines for breaking the rules start in August 2027.',
+    ],
+  },
+  {
+    id: 'n4',
+    source: 'Ars Technica',
+    time: '5h ago',
+    title: 'Confidential computing comes to mainstream cloud GPUs',
+    summary: 'Encrypted-in-use inference is now a checkbox on two of the three big clouds.',
+    points: [
+      'Two of the three big clouds now offer encrypted-in-use GPU inference as a simple setting.',
+      'The performance cost is down to about 5% on the newest chips.',
+      'It costs the same as regular instances during the launch period.',
+    ],
+  },
+  {
+    id: 'n5',
+    source: 'Wired',
+    time: '8h ago',
+    title: 'The private AI assistant buyer’s guide, 2026 edition',
+    summary: 'Six assistants tested on what they keep, what they share, and what they forget.',
+    points: [
+      'Six assistants were tested on what they store, share and actually delete.',
+      'Only two kept no conversation history by default.',
+      'Hardware-backed enclaves were the clearest difference between them.',
+    ],
+  },
+]
+
+const outlets = ['Reuters', 'TechCrunch', 'Bloomberg', 'The Verge', 'Financial Times']
+const newsTemplates: { title: (t: string) => string; summary: (t: string) => string }[] = [
+  { title: (t) => `${t}: the three stories everyone is reading today`, summary: () => 'The most-shared coverage of the day, with the duplicates removed.' },
+  { title: (t) => `New from ${t}: an update and the first reactions`, summary: () => 'What shipped, what changed, and what people noticed first.' },
+  { title: (t) => `Analysts weigh in on ${t}`, summary: () => 'Three takes worth reading, with the key numbers pulled out.' },
+  { title: (t) => `${t} in the press this week`, summary: () => 'Coverage from the last seven days, newest first.' },
+  { title: (t) => `What people are saying about ${t}`, summary: () => 'The threads and posts getting the most attention right now.' },
+]
+
+const siteHeadlines = [
+  'the three stories everyone is reading today',
+  'a fresh update and the first reactions',
+  'what analysts make of the latest numbers',
+  'this week’s most-read pieces',
+  'the posts readers are discussing most',
+]
+
+/** a website (lido.fi, https://theverge.com/tech) rather than a topic or company */
+export function isSite(term: string) {
+  return /^(https?:\/\/)?(www\.)?[\w-]+(\.[\w-]+)+(\/\S*)?$/i.test(term.trim())
+}
+
+export function siteName(term: string) {
+  return term
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/^www\./i, '')
+    .replace(/\/.*$/, '')
+}
+
+/** five placeholder stories — tailored to the user's sources when there are any */
+export function newsFor(sources?: string[]): NewsItem[] {
+  if (!sources?.length) return newsPool
+  const times = ['12 min ago', '1h ago', '3h ago', '5h ago', '8h ago']
+  return newsTemplates.map((tpl, i) => {
+    const term = sources[i % sources.length]
+    const site = isSite(term)
+    const name = site ? siteName(term) : term
+    // longer free-text topics read better in quotes inside a headline
+    const inTitle = !site && name.split(/\s+/).length >= 3 ? `“${name}”` : name
+    return {
+      id: `n${i}`,
+      source: site ? name : outlets[i % outlets.length],
+      time: times[i],
+      title: site ? `${name}: ${siteHeadlines[i]}` : tpl.title(inTitle),
+      summary: tpl.summary(name),
+      points: [
+        `Most of the coverage is about the latest from ${inTitle}.`,
+        'Early reactions are mixed — people like the direction, but have questions about timing.',
+        `Wisp found ${7 + i * 2} related articles; this sums up the three most cited.`,
+      ],
+      tag: name,
+    }
+  })
+}
+
+export function sourcesLabel(sources?: string[]) {
+  if (!sources?.length) return 'AI, privacy and crypto'
+  const names = sources.map((s) => (isSite(s) ? siteName(s) : s))
+  return names.length > 3 ? `${names.slice(0, 3).join(', ')} +${names.length - 3}` : listNames(names)
+}
+
 /* ------------------------------------------------------------ placeholders */
 
 export const placeholderMeta: Record<
@@ -922,6 +1093,7 @@ export const placeholderMeta: Record<
   calendar: { name: 'Google Calendar', title: 'Know what’s next today', logo: 'calendar', connects: 'calendar' },
   granola: { name: 'Granola', title: 'Keep what you promised in meetings', logo: 'granola', connects: 'granola' },
   linear: { name: 'Linear', title: 'See how the team is moving', logo: 'linear', connects: 'linear' },
+  news: { name: 'News', title: 'Follow news on anything', logo: 'news' },
   custom: { name: 'Custom widget', title: 'Turn any tool into a chart', logo: 'custom' },
   more: { name: 'More tools', title: 'Notion, Google Drive and more', logo: 'more' },
 }
@@ -942,7 +1114,8 @@ export const placeholderEmails = [
 export function defaultPlaceholders(): Placeholder[] {
   return [
     { id: 'telegram', x: 0, y: 0, w: 2, h: 2 },
-    { id: 'gmail', x: 2, y: 0, w: 1, h: 2 },
+    { id: 'gmail', x: 2, y: 0, w: 1, h: 1 },
+    { id: 'news', x: 2, y: 1, w: 1, h: 1 },
     { id: 'calendar', x: 3, y: 0, w: 1, h: 1 },
     { id: 'granola', x: 3, y: 1, w: 1, h: 1 },
     { id: 'custom', x: 0, y: 2, w: 2, h: 1 },

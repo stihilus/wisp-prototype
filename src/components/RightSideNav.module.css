@@ -175,3 +175,172 @@
 .feedbackButton:hover {
   background: var(--field-stroke);
 }
+
+/* -------------------------------------------------------- report nudge */
+
+.reportWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.feedbackButton {
+  position: relative;
+}
+
+/* three soft beats: a touch bigger, a warm tint, then back */
+.feedbackButton[data-nudge] {
+  animation: reportPulse 1.4s cubic-bezier(0.3, 0.7, 0.4, 1) 3;
+}
+
+.feedbackButton[data-nudge]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: reportRipple 1.4s ease-out 3;
+}
+
+@keyframes reportPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    background: var(--button-background);
+    color: var(--icon-active);
+  }
+  25% {
+    transform: scale(1.1);
+    background: rgba(255, 193, 109, 0.22);
+    color: var(--brand-500);
+  }
+  45% {
+    transform: scale(0.97);
+  }
+  65% {
+    transform: scale(1.02);
+    background: rgba(255, 193, 109, 0.12);
+  }
+}
+
+@keyframes reportRipple {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 193, 109, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(255, 193, 109, 0);
+  }
+}
+
+.reportHint {
+  position: absolute;
+  right: calc(100% + 14px);
+  top: 50%;
+  z-index: 25;
+  width: 236px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 10px 10px 14px;
+  border: 1px solid var(--button-stroke-active);
+  border-radius: 12px;
+  background: var(--field-background);
+  box-shadow: var(--shadow-popover);
+  box-sizing: border-box;
+  transform-origin: right center;
+  transform: translateY(-50%);
+  /* pops in, stays, and fades out on its own — 5s in total */
+  animation: hintLife 5s cubic-bezier(0.2, 1, 0.4, 1) forwards;
+}
+
+.reportHint[data-closing] {
+  animation: hintClose 0.18s ease-in forwards;
+}
+
+/* arrow pointing at the button */
+.reportHint::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -5.5px;
+  width: 10px;
+  height: 10px;
+  background: var(--field-background);
+  border: 1px solid var(--button-stroke-active);
+  border-left: none;
+  border-bottom: none;
+  box-sizing: border-box;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+@keyframes hintLife {
+  0% {
+    opacity: 0;
+    transform: translateY(-50%) translateX(8px) scale(0.92);
+  }
+  6%,
+  95% {
+    opacity: 1;
+    transform: translateY(-50%);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50%) translateX(4px);
+  }
+}
+
+@keyframes hintClose {
+  to {
+    opacity: 0;
+    transform: translateY(-50%) translateX(4px) scale(0.97);
+  }
+}
+
+.reportHintText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.reportHintTitle {
+  font: 600 12px/1.3 var(--font-family-base);
+  color: var(--text-primary);
+}
+
+.reportHintSub {
+  font: 500 11px/1.4 var(--font-family-base);
+  color: var(--text-secondary);
+}
+
+.reportHintClose {
+  display: inline-flex;
+  padding: 3px;
+  margin: -2px -2px 0 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--icon-primary);
+  cursor: pointer;
+}
+
+.reportHintClose:hover {
+  color: var(--icon-active);
+  background: var(--button-background);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feedbackButton[data-nudge],
+  .feedbackButton[data-nudge]::after {
+    animation: none;
+  }
+  /* no movement, but it still has to close itself */
+  .reportHint {
+    animation: hintFade 5s steps(1, end) forwards;
+  }
+}
+
+@keyframes hintFade {
+  to {
+    opacity: 0;
+  }
+}

@@ -1,7 +1,8 @@
 import { Icon } from '../Icon'
 import { ToolLogo } from './ToolLogo'
 import { closeSmallIcon, gripIcon, lockerIcon, resizeHandleIcon } from '../../assets/icons'
-import { placeholderChats, placeholderEmails, placeholderMeta, type Placeholder } from '../../data/dashboard'
+import { newsFor, placeholderChats, placeholderEmails, placeholderMeta, type Placeholder } from '../../data/dashboard'
+import { NewsCarousel } from './WidgetBody'
 import ui from '../ui/controls.module.css'
 import styles from './PlaceholderCard.module.css'
 
@@ -78,6 +79,8 @@ function Example({ placeholder, size }: { placeholder: Placeholder; size: { w: n
           <span className={styles.exText}>e.g. issues closed each week in Linear, or ad spend from your own MCP</span>
         </div>
       )
+    case 'news':
+      return <NewsCarousel items={newsFor()} interactive={false} compact />
     case 'more':
       return (
         <div className={styles.moreLogos}>
@@ -98,6 +101,7 @@ export function PlaceholderCard({ placeholder, size, connecting, onConnect, onHi
   if (placeholder.id === 'gmail') primaryLabel = 'Connect Gmail'
   if (placeholder.id === 'custom') primaryLabel = 'Create a widget'
   if (placeholder.id === 'more') primaryLabel = 'Browse'
+  if (placeholder.id === 'news') primaryLabel = 'Set up'
 
   return (
     <article className={styles.card} data-kind={placeholder.id}>
@@ -127,12 +131,12 @@ export function PlaceholderCard({ placeholder, size, connecting, onConnect, onHi
           data-no-drag
         >
           {connecting && <span className={ui.spinner} />}
-          {connecting ? (isTool ? 'Connecting…' : 'Building…') : primaryLabel}
+          {connecting ? (isTool ? 'Connecting…' : placeholder.id === 'news' ? 'Searching…' : 'Building…') : primaryLabel}
         </button>
-        {isTool ? (
+        {isTool || placeholder.id === 'news' ? (
           <span className={styles.local}>
             <Icon svg={lockerIcon} size={12} />
-            Read on this Mac
+            {isTool ? 'Read on this Mac' : 'Searched privately'}
           </span>
         ) : (
           <button type="button" className={ui.link} onClick={onRequest} data-no-drag>

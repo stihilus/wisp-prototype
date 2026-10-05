@@ -8,6 +8,7 @@ import { WidgetCard } from './WidgetCard'
 import { PlaceholderCard } from './PlaceholderCard'
 import { AddWidgetMenu, ReuseModal, ScopeModal } from './AddFlows'
 import { AddWidgetModal } from './AddWidgetModal'
+import { NewsSetupModal } from './NewsSetupModal'
 import { AutoRefreshPopover } from './WidgetPopovers'
 import { WorkspaceNameForm } from './WorkspaceNameForm'
 import { addSmallIcon, chevSmallIcon, closeSmallIcon, dotsV2Icon, refreshIcon, sparkleBrandIcon } from '../../assets/icons'
@@ -50,6 +51,7 @@ type Flow =
       widgetId?: string
       initial?: string[]
     }
+  | { type: 'news'; at?: { x: number; y: number }; widgetId?: string; initial?: string[] }
   | null
 
 type HeaderPanel = 'filter' | 'wsMenu' | 'autoRefresh' | 'newWs' | 'rename' | null
@@ -109,6 +111,11 @@ export function HomeDashboard() {
 
   const startAdd = (kind: WidgetKind, opts: { preset?: string; prompt?: string; at?: { x: number; y: number } } = {}) => {
     const { preset, prompt, at } = opts
+    // News starts with a small setup: what should Wisp follow?
+    if (kind === 'news') {
+      setFlow({ type: 'news', at })
+      return
+    }
     if (!isTool(kind) || here.has(kind)) {
       actions.addWidget(ws.id, kind, { preset, prompt, at })
       return
@@ -280,7 +287,9 @@ export function HomeDashboard() {
                   size={ctx}
                   now={now}
                   onChooseScope={(w) =>
-                    setFlow({
+                    w.kind === 'news'
+                      ? setFlow({ type: 'news', widgetId: w.id, initial: w.sources })
+                      : setFlow({
                       type: 'scope',
                       tool: w.kind as ToolId,
                       source: 'shared',
@@ -306,7 +315,7 @@ export function HomeDashboard() {
               onChange={(layout) => actions.setPlaceholderLayout(ws.id, layout)}
               renderItem={(p, ctx) => {
                 const meta = placeholderMeta[p.id]
-                const kind: WidgetKind | undefined = meta.connects ?? (p.id === 'custom' ? 'chart' : undefined)
+                const kind: WidgetKind | undefined = meta.connects ?? (p.id === 'custom' ? 'chart' : p.id === 'news' ? 'news' : undefined)
                 return (
                   <PlaceholderCard
                     placeholder={p}
@@ -314,6 +323,7 @@ export function HomeDashboard() {
                     connecting={!!(kind && connecting[`${ws.id}:${kind}`])}
                     onConnect={() => {
                       if (p.id === 'custom') actions.connectTool(ws.id, 'chart', { at: { x: p.x, y: p.y } })
+                      else if (p.id === 'news') startAdd('news', { at: { x: p.x, y: p.y } })
                       else if (meta.connects) startAdd(meta.connects, { at: { x: p.x, y: p.y } })
                     }}
                     onBrowse={() => setFlow({ type: 'modal' })}
@@ -363,6 +373,20 @@ export function HomeDashboard() {
                   </button>
                 )
               })}
+              {!ws.widgets.some((w) => w.kind === 'news') && (
+                <button type="button" className={styles.stripItem} onClick={() => startAdd('news')} disabled={!!connecting[`${ws.id}:news`]}>
+                  <ToolLogo kind="news" size={24} />
+                  <span className={styles.stripText}>
+                    <span className={styles.stripName}>News</span>
+                    <span className={styles.stripBlurb}>{connecting[`${ws.id}:news`] ? 'Searching…' : 'Sites, topics, companies'}</span>
+                  </span>
+                  {connecting[`${ws.id}:news`] ? (
+                    <span className={`${ui.spinner} ${styles.stripSpinner}`} />
+                  ) : (
+                    <Icon svg={addSmallIcon} size={14} className={styles.stripPlus} />
+                  )}
+                </button>
+              )}
               <button type="button" className={styles.stripItem} onClick={() => setFlow({ type: 'modal' })}>
                 <ToolLogo kind="custom" size={24} />
                 <span className={styles.stripText}>
@@ -553,6 +577,26 @@ export function HomeDashboard() {
 
       {flow?.type === 'reuse' && (
         <ReuseModal tool={flow.tool} workspace={ws} from={flow.from} onClose={() => setFlow(null)} onContinue={onReuseContinue} />
+      )}
+
+      {flow?.type === 'news' && (
+        <NewsSetupModal
+          workspaceName={ws.name}
+          initial={flow.initial}
+          editing={!!flow.widgetId}
+          onClose={() => setFlow(null)}
+          onConfirm={(sources) => {
+            const { widgetId, at } = flow
+            setFlow(null)
+            if (widgetId) {
+              actions.updateWidget(ws.id, widgetId, { sources })
+              actions.refreshWidget(ws.id, widgetId)
+              actions.toast('Sources updated — Wisp is looking for new stories')
+            } else {
+              actions.connectTool(ws.id, 'news', { at, sources })
+            }
+          }}
+        />
       )}
 
       {flow?.type === 'scope' && (

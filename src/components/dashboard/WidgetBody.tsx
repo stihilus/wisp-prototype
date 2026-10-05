@@ -1,8 +1,8 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Icon } from '../Icon'
 import { ToolLogo } from './ToolLogo'
-import { arrowRightIcon, checkIcon, circleUncheckIcon } from '../../assets/icons'
-import type { ChatItem, Widget, WidgetBodySpec, WidgetContent } from '../../data/dashboard'
+import { arrowRightIcon, checkIcon, chevRightIcon, circleUncheckIcon } from '../../assets/icons'
+import type { ChatItem, NewsItem, Widget, WidgetBodySpec, WidgetContent } from '../../data/dashboard'
 import styles from './WidgetBody.module.css'
 
 export type BodyVariant = 'grid' | 'feed'
@@ -15,6 +15,10 @@ type BodyProps = {
   rowActionLabel?: string
   onRowAction?: (label: string, detail: string) => void
   onToggleTodo?: (id: string) => void
+  /** small heads-up for actions the prototype doesn't really do */
+  onNotice?: (text: string) => void
+  /** News: a story is open inside the widget */
+  onDetailChange?: (open: boolean) => void
 }
 
 /** Marks the list as overflowing so it can fade out instead of hard-clipping. */
@@ -281,13 +285,238 @@ function Bars({ spec, content, size }: { spec: Extract<WidgetBodySpec, { type: '
   )
 }
 
+/* ---------------------------------------------------------------- News */
+
+/** one story at a time with arrows — the small News widget (and its previews) */
+export function NewsCarousel({
+  items,
+  interactive = true,
+  compact = false,
+  initialIndex = 0,
+  onOpen,
+}: {
+  items: NewsItem[]
+  interactive?: boolean
+  /** headline-only version for tight spots (the Home placeholder) */
+  compact?: boolean
+  initialIndex?: number
+  onOpen?: (item: NewsItem, index: number) => void
+}) {
+  const [index, setIndex] = useState(initialIndex)
+  const [dir, setDir] = useState<1 | -1>(1)
+  const item = items[index % items.length]
+
+  const go = (d: 1 | -1) => {
+    setDir(d)
+    setIndex((i) => (i + d + items.length) % items.length)
+  }
+
+  return (
+    <div className={styles.carousel} data-compact={compact || undefined}>
+      <div
+        key={index}
+        className={styles.slide}
+        data-dir={dir}
+        role={interactive ? 'button' : undefined}
+        tabIndex={interactive ? 0 : undefined}
+        aria-label={interactive ? `Open “${item.title}”` : undefined}
+        onClick={() => interactive && onOpen?.(item, index)}
+        onKeyDown={(e) => {
+          if (interactive && e.key === 'Enter') onOpen?.(item, index)
+        }}
+      >
+        {!compact && (
+          <span className={styles.newsMeta}>
+            {item.tag && item.tag !== item.source && <span className={styles.newsTag}>{item.tag}</span>}
+            {item.source} · {item.time}
+          </span>
+        )}
+        <span className={styles.slideTitle}>{item.title}</span>
+        {!compact && <span className={styles.slideSummary}>{item.summary}</span>}
+      </div>
+      <div className={styles.carouselNav}>
+        <span className={styles.carouselDots} aria-label={`Story ${index + 1} of ${items.length}`}>
+          {items.map((n, i) => (
+            <span key={n.id} data-on={i === index} />
+          ))}
+        </span>
+        <span className={styles.carouselArrows}>
+          <button
+            type="button"
+            className={styles.arrowButton}
+            aria-label="Previous story"
+            disabled={!interactive}
+            data-no-drag
+            onClick={(e) => {
+              e.stopPropagation()
+              go(-1)
+            }}
+          >
+            <Icon svg={chevRightIcon} size={14} className={styles.flip} />
+          </button>
+          <button
+            type="button"
+            className={styles.arrowButton}
+            aria-label="Next story"
+            disabled={!interactive}
+            data-no-drag
+            onClick={(e) => {
+              e.stopPropagation()
+              go(1)
+            }}
+          >
+            <Icon svg={chevRightIcon} size={14} />
+          </button>
+        </span>
+      </div>
+    </div>
+  )
+}
+
+/** a story opened inside the widget: Wisp's summary first, actions after */
+function NewsDetail({
+  item,
+  onBack,
+  onAsk,
+  onReadOriginal,
+}: {
+  item: NewsItem
+  onBack: () => void
+  onAsk: () => void
+  onReadOriginal?: () => void
+}) {
+  return (
+    <div className={styles.newsDetail}>
+      <div className={styles.detailTop}>
+        <button type="button" className={styles.detailBack} onClick={onBack} data-no-drag>
+          <Icon svg={chevRightIcon} size={14} className={styles.flip} />
+          All stories
+        </button>
+        <span className={styles.newsMeta}>
+          {item.source} · {item.time}
+        </span>
+      </div>
+      <div className={`${styles.detailScroll} thin-scroll`}>
+        <h4 className={styles.detailTitle}>{item.title}</h4>
+        <p className={styles.detailLede}>{item.summary}</p>
+        <ul className={styles.detailPoints}>
+          {item.points.map((p) => (
+            <li key={p}>{p}</li>
+          ))}
+        </ul>
+      </div>
+      <div className={styles.detailActions}>
+        <button type="button" className={styles.detailAsk} onClick={onAsk} data-no-drag>
+          Ask Wisp more about this
+          <Icon svg={arrowRightIcon} size={12} />
+        </button>
+        {onReadOriginal && (
+          <button type="button" className={styles.detailLink} onClick={onReadOriginal} data-no-drag>
+            Read original ↗
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function NewsBody({
+  content,
+  spec,
+  size,
+  variant,
+  onRowAction,
+  onNotice,
+  onDetailChange,
+}: {
+  content: WidgetContent
+  spec: Extract<WidgetBodySpec, { type: 'news' }>
+  size: { w: number; h: number }
+  variant: BodyVariant
+  onRowAction?: BodyProps['onRowAction']
+  onNotice?: BodyProps['onNotice']
+  onDetailChange?: BodyProps['onDetailChange']
+}) {
+  // which story is open (null = overview), and where the carousel was
+  const [open, setOpen] = useState<number | null>(null)
+  const [lastIndex, setLastIndex] = useState(0)
+
+  // a refresh remounts the body — let the card bring its footer back
+  const detailChange = useRef(onDetailChange)
+  detailChange.current = onDetailChange
+  useEffect(() => () => detailChange.current?.(false), [])
+
+  const show = (index: number | null) => {
+    setOpen(index)
+    if (index !== null) setLastIndex(index)
+    onDetailChange?.(index !== null)
+  }
+
+  if (open !== null && spec.items[open]) {
+    const item = spec.items[open]
+    return (
+      <NewsDetail
+        key={item.id}
+        item={item}
+        onBack={() => show(null)}
+        onAsk={() => onRowAction?.(item.title, item.points.map((p) => `• ${p}`).join('\n'))}
+        onReadOriginal={onNotice ? () => onNotice(`Opens the story on ${item.source} in your browser (not part of this prototype)`) : undefined}
+      />
+    )
+  }
+
+  // tall widgets list every story; short ones show one at a time
+  if (size.h < 2 && variant === 'grid') {
+    return <NewsCarousel items={spec.items} initialIndex={lastIndex} onOpen={(_, i) => show(i)} />
+  }
+  return (
+    <div className={styles.newsList}>
+      <div>
+        <h3 className={styles.headline}>{content.headline}</h3>
+        <p className={styles.sub}>{spec.label}</p>
+      </div>
+      <FadeList>
+        {spec.items.map((item, i) => (
+          <div
+            key={item.id}
+            className={styles.newsRow}
+            role="button"
+            tabIndex={0}
+            onClick={() => show(i)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') show(i)
+            }}
+          >
+            <span className={styles.newsMeta}>
+              {item.tag && item.tag !== item.source && <span className={styles.newsTag}>{item.tag}</span>}
+              {item.source} · {item.time}
+            </span>
+            <span className={styles.newsTitle}>{item.title}</span>
+            {size.w >= 2 && <span className={styles.newsSummary}>{item.summary}</span>}
+          </div>
+        ))}
+      </FadeList>
+    </div>
+  )
+}
+
 /* --------------------------------------------------------------- body */
 
 export function bodyHasOwnHeading(spec: WidgetBodySpec) {
-  return spec.type === 'traffic' || spec.type === 'vitals' || spec.type === 'bars'
+  return spec.type === 'traffic' || spec.type === 'vitals' || spec.type === 'bars' || spec.type === 'news'
 }
 
-export function WidgetBody({ widget, content, size, variant, rowActionLabel = 'Ask Wisp', onRowAction, onToggleTodo }: BodyProps) {
+export function WidgetBody({
+  widget,
+  content,
+  size,
+  variant,
+  rowActionLabel = 'Ask Wisp',
+  onRowAction,
+  onToggleTodo,
+  onNotice,
+  onDetailChange,
+}: BodyProps) {
   const spec = content.body
 
   switch (spec.type) {
@@ -373,6 +602,19 @@ export function WidgetBody({ widget, content, size, variant, rowActionLabel = 'A
 
     case 'bars':
       return <Bars spec={spec} content={content} size={size} />
+
+    case 'news':
+      return (
+        <NewsBody
+          content={content}
+          spec={spec}
+          size={size}
+          variant={variant}
+          onRowAction={onRowAction}
+          onNotice={onNotice}
+          onDetailChange={onDetailChange}
+        />
+      )
 
     case 'digest':
       return (

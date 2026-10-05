@@ -21,7 +21,7 @@ function centerOf(el: HTMLElement | null) {
 export function ModelPicker({ guidedTrigger, autoSelectModelId }: ModelPickerProps) {
   const [open, setOpen] = useState(false)
   const [modelsOpen, setModelsOpen] = useState(false)
-  const [selectedTier, setSelectedTier] = useState('advanced')
+  const [selectedTier, setSelectedTier] = useState('balanced')
   const [selectedModel, setSelectedModel] = useState<string | null>(null)
   const [cursor, setCursor] = useState<CursorState | null>(null)
   const [showTip, setShowTip] = useState(false)
@@ -118,8 +118,8 @@ export function ModelPicker({ guidedTrigger, autoSelectModelId }: ModelPickerPro
   }, [guidedTrigger])
 
   const currentLabel = selectedModel
-    ? modelOptions.find((m) => m.id === selectedModel)?.name ?? 'Auto'
-    : 'Auto'
+    ? modelOptions.find((m) => m.id === selectedModel)?.name ?? 'Balanced'
+    : modelTiers.find((t) => t.id === selectedTier)?.name ?? 'Balanced'
 
   return (
     <div className={styles.wrap} ref={wrapRef}>
@@ -127,6 +127,7 @@ export function ModelPicker({ guidedTrigger, autoSelectModelId }: ModelPickerPro
         ref={triggerRef}
         type="button"
         className={styles.trigger}
+        data-tour="model"
         onClick={() => {
           setShowTip(false)
           if (open) closeAndReset()
@@ -209,7 +210,7 @@ export function ModelPicker({ guidedTrigger, autoSelectModelId }: ModelPickerPro
           >
             <Icon svg={closeIcon} size={10} />
           </button>
-          <p>Every model lives here — come back anytime you want to choose one yourself instead of Auto.</p>
+          <p>Every model lives here — come back anytime you want to pick one yourself instead of Balanced or Advanced.</p>
         </div>
       )}
 

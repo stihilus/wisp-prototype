@@ -255,3 +255,11 @@
 .card:hover .resizeGlyph {
   opacity: 1;
 }
+
+/* the News example is a live-looking carousel, so it keeps its arrows unfaded */
+.card[data-kind='news'] .example {
+  display: flex;
+  flex-direction: column;
+  -webkit-mask-image: none;
+  mask-image: none;
+}

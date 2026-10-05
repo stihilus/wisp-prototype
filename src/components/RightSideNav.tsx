@@ -1,9 +1,10 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Icon } from './Icon'
 import { ConnectorsDropdown } from './ConnectorsDropdown'
 import {
   connectorIcon,
   ellipse149Icon,
+  closeSmallIcon,
   feedIcon,
   feedbackFilledIcon,
   filesIcon,
@@ -12,6 +13,7 @@ import {
   skillsIcon,
 } from '../assets/icons'
 import { logoGranola, logoLinear } from '../assets/logos'
+import { usePrototype } from '../store/prototype'
 import styles from './RightSideNav.module.css'
 
 type PanelKey = 'files' | 'transcript' | 'skills' | 'connectors'
@@ -57,6 +59,7 @@ export function RightSideNav({ activePanel, onTogglePanel, onClosePanel, feedBad
           type="button"
           className={styles.pillButton}
           data-tooltip="Transcript"
+          data-tour="transcript"
           onClick={() => onTogglePanel('transcript')}
           aria-pressed={activePanel === 'transcript'}
         >
@@ -78,6 +81,7 @@ export function RightSideNav({ activePanel, onTogglePanel, onClosePanel, feedBad
             type="button"
             className={styles.pillButton}
             data-tooltip="Connectors"
+            data-tour="connectors"
             onClick={() => onTogglePanel('connectors')}
             aria-pressed={activePanel === 'connectors'}
           >
@@ -105,9 +109,61 @@ export function RightSideNav({ activePanel, onTogglePanel, onClosePanel, feedBad
         </div>
       </div>
 
-      <button type="button" className={styles.feedbackButton} aria-label="Send feedback">
+      <ReportButton />
+    </nav>
+  )
+}
+
+/** "Leave a report" — can be nudged: a few soft pulses and a hint that pops out
+ *  and closes itself after 5s (or right away with its X). */
+function ReportButton() {
+  const { reportNudge } = usePrototype()
+  const [pulseEnded, setPulseEnded] = useState(0)
+  const [hintGone, setHintGone] = useState(0)
+  const [closing, setClosing] = useState(0)
+  const pulsing = reportNudge > 0 && pulseEnded !== reportNudge
+  const hintVisible = reportNudge > 0 && hintGone !== reportNudge
+
+  return (
+    <div className={styles.reportWrap}>
+      <button
+        // remount on every nudge so the pulse restarts even if one is still running
+        key={reportNudge}
+        type="button"
+        className={styles.feedbackButton}
+        aria-label="Leave a report"
+        data-tour="feedback"
+        data-nudge={pulsing || undefined}
+        onAnimationEnd={(e) => {
+          if (e.target === e.currentTarget) setPulseEnded(reportNudge)
+        }}
+        onClick={() => {
+          setPulseEnded(reportNudge)
+          setClosing(reportNudge)
+        }}
+      >
         <Icon svg={feedbackFilledIcon} />
       </button>
-    </nav>
+      {hintVisible && (
+        <div
+          key={reportNudge}
+          className={styles.reportHint}
+          data-closing={closing === reportNudge || undefined}
+          role="status"
+          // the hint's own animation pops it in, holds it, and fades it out at 5s
+          onAnimationEnd={(e) => {
+            if (e.target === e.currentTarget) setHintGone(reportNudge)
+          }}
+        >
+          <span className={styles.reportHintText}>
+            <span className={styles.reportHintTitle}>Something not working?</span>
+            <span className={styles.reportHintSub}>Leave a report — it goes straight to the team.</span>
+          </span>
+          <button type="button" className={styles.reportHintClose} onClick={() => setClosing(reportNudge)} aria-label="Dismiss">
+            <Icon svg={closeSmallIcon} size={12} />
+          </button>
+        </div>
+      )}
+    </div>
   )
 }
