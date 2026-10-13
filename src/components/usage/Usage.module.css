@@ -1,0 +1,432 @@
+/* Plan pill + usage ring in the top bar, its tooltip / popover, and the limit
+   banner that tucks under the top of the input. */
+
+/* ----------------------------------------------------------------- ring */
+
+.ring {
+  display: block;
+  flex-shrink: 0;
+  fill: none;
+}
+
+.ringTrack {
+  fill: none;
+  stroke: var(--button-stroke-active);
+  stroke-width: 2.24;
+}
+
+.ringProgress {
+  fill: none;
+  stroke: var(--text-secondary);
+  stroke-width: 2.24;
+  transition:
+    stroke-dasharray 0.4s ease,
+    stroke 0.2s ease;
+}
+
+.ring[data-tone='near'] .ringProgress {
+  stroke: var(--brand-500);
+}
+
+.ring[data-tone='reached'] .ringProgress {
+  stroke: var(--icon-danger);
+}
+
+/* -------------------------------------------------------------- top bar */
+
+.controls {
+  -webkit-app-region: no-drag;
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+}
+
+.planPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 26px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border: 1px solid var(--field-stroke);
+  border-radius: var(--radius-full);
+}
+
+.planName {
+  font: 500 12px/16px var(--font-family-base);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.planDivider {
+  width: 1px;
+  height: 14px;
+  background: var(--field-stroke);
+}
+
+.planUpgrade {
+  padding: 0;
+  border: none;
+  background: none;
+  font: 500 12px/16px var(--font-family-base);
+  color: var(--blue-500);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.planUpgrade:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.usageButton {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 1px solid var(--field-stroke);
+  border-radius: var(--radius-full);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.usageButton:hover,
+.usageButton[data-open='true'] {
+  background: var(--button-background);
+  border-color: var(--button-background);
+}
+
+/* -------------------------------------------------------------- tooltip */
+
+.tooltip {
+  position: fixed;
+  z-index: 70;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  border: 1px solid var(--button-stroke-active);
+  border-radius: 10px;
+  background: var(--button-background);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: tipIn 0.14s ease-out;
+}
+
+@keyframes tipIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-3px);
+  }
+}
+
+.tooltipTitle {
+  font: 500 12px/16px var(--font-family-base);
+  color: var(--text-primary);
+}
+
+.tooltipLine {
+  font: 500 10px/14px var(--font-family-base);
+  color: var(--text-secondary);
+}
+
+.tooltipHint {
+  margin-top: 2px;
+  font: 500 10px/14px var(--font-family-base);
+  color: var(--text-brand);
+}
+
+/* -------------------------------------------------------------- popover */
+
+.popover {
+  width: 304px;
+  border-radius: var(--radius-lg);
+  background: var(--field-background);
+  border-color: var(--field-stroke);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 16px 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-sm);
+}
+
+.planText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.planTitle {
+  font: 600 16px/22px var(--font-family-base);
+  color: var(--text-primary);
+}
+
+.planSub {
+  font: 500 12px/16px var(--font-family-base);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+/* a bit narrower than the CTA so "Same privacy on every plan" stays on one line */
+.header .pillBtn {
+  padding: 0 20px;
+}
+
+.pillBtn {
+  flex-shrink: 0;
+  height: 36px;
+  padding: 0 24px;
+  border: none;
+  border-radius: var(--radius-full);
+  font: 500 14px/19px var(--font-family-base);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    filter 0.15s ease;
+}
+
+.pillBtnInvert {
+  background: var(--button-background-invert);
+  color: var(--text-invert);
+}
+
+.pillBtnInvert:hover {
+  filter: brightness(1.06);
+}
+
+.pillBtnOutline {
+  background: transparent;
+  border: 1px solid var(--button-stroke);
+  color: var(--text-primary);
+}
+
+.pillBtnOutline:hover {
+  background: var(--button-background);
+}
+
+.pillBtnCta {
+  width: 100%;
+  background: var(--button-background-cta);
+  color: var(--text-on-accent);
+  box-shadow: 0 0 7px rgba(255, 193, 109, 0.4);
+}
+
+.pillBtnCta:hover {
+  filter: brightness(1.06);
+}
+
+.rule {
+  height: 1px;
+  background: var(--line-default);
+}
+
+.meter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meterRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--gap-sm);
+}
+
+.meterLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meterTitle {
+  font: 500 14px/19px var(--font-family-base);
+  color: var(--text-primary);
+}
+
+.meterReset {
+  font: 500 12px/16px var(--font-family-base);
+  color: var(--text-tertiary);
+}
+
+.meterValue {
+  font: 500 12px/16px var(--font-family-base);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.meterValue[data-tone='near'] {
+  color: var(--text-brand);
+}
+
+.meterValue[data-tone='reached'] {
+  color: var(--text-danger);
+}
+
+.track {
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--button-background);
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--text-secondary);
+  transition: width 0.4s ease;
+}
+
+.bar[data-tone='near'] {
+  background: var(--brand-500);
+}
+
+.bar[data-tone='reached'] {
+  background: var(--icon-danger);
+}
+
+.upsell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--alpha-brand-10);
+}
+
+.upsellTitle {
+  font: 500 12px/16px var(--font-family-base);
+  color: var(--text-primary);
+}
+
+.upsellBody {
+  margin-bottom: 6px;
+  font: 500 10px/14px var(--font-family-base);
+  color: var(--text-secondary);
+}
+
+.details {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  font: 500 12px/16px var(--font-family-base);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.details:hover {
+  color: var(--text-primary);
+}
+
+/* ---------------------------------------------------- banner over input */
+
+.banner {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  padding: 8px 14px 34px;
+  box-sizing: border-box;
+  border: 1px solid var(--field-stroke);
+  border-bottom: none;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--field-background);
+  animation: bannerIn 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes bannerIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.bannerMessage {
+  flex-shrink: 0;
+  font: 500 12px/16px var(--font-family-base);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.bannerDetail {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font: 500 12px/16px var(--font-family-base);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.bannerSpacer {
+  flex: 1;
+  min-width: 4px;
+}
+
+.bannerLink {
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: 500 12px/16px var(--font-family-base);
+  color: var(--text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.bannerLink:hover {
+  color: var(--text-primary);
+}
+
+.bannerUpgrade {
+  color: var(--blue-500);
+}
+
+.bannerUpgrade:hover {
+  color: var(--blue-500);
+  filter: brightness(1.15);
+}
+
+.bannerClose {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+
+.bannerClose:hover {
+  color: var(--text-secondary);
+}

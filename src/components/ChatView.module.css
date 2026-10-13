@@ -1,4 +1,5 @@
 .chatView {
+  position: relative;
   width: 100%;
   height: 100%;
   display: flex;
@@ -12,6 +13,8 @@
   overflow-y: auto;
   display: flex;
   justify-content: center;
+  /* let the column grow with its content instead of squeezing the cards */
+  align-items: flex-start;
 }
 
 .messages {
@@ -41,43 +44,6 @@
   align-self: flex-start;
   width: 100%;
   box-sizing: border-box;
-}
-
-.toolCard {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--gap-md);
-  height: 52px;
-  padding: 0 var(--padding-lg);
-  background: var(--field-background);
-  border: 1px solid var(--field-stroke);
-  border-radius: var(--radius-full);
-  box-sizing: border-box;
-  color: var(--icon-primary);
-}
-
-.toolCardLeft {
-  display: flex;
-  align-items: center;
-  gap: var(--gap-md);
-  min-width: 0;
-  flex: 1;
-}
-
-.toolCardText {
-  margin: 0;
-  flex: 1;
-  min-width: 0;
-  font: var(--font-body-md);
-  color: var(--text-tertiary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.toolCardText span {
-  color: var(--text-secondary);
 }
 
 .dock {
@@ -152,4 +118,266 @@
   flex-shrink: 0;
   font: 500 10px/1 var(--font-family-base);
   color: var(--text-tertiary);
+}
+
+/* ------------------------------------------------------- long answers */
+
+.answer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.answerHeading {
+  margin: 14px 0 -2px;
+  font: 600 16px/1.35 var(--font-family-base);
+  color: var(--text-primary);
+  scroll-margin-top: 28px;
+}
+
+.answer > .answerHeading:first-child {
+  margin-top: 0;
+}
+
+.answerText {
+  margin: 0;
+  font: 500 14px/1.6 var(--font-family-base);
+  color: var(--text-primary);
+}
+
+.answerText b,
+.answerList b {
+  font-weight: 700;
+}
+
+.answerList {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font: 500 14px/1.6 var(--font-family-base);
+  color: var(--text-primary);
+}
+
+.answerList li::marker {
+  color: var(--text-tertiary);
+}
+
+.answerQuote {
+  margin: 0;
+  padding: 2px 0 2px 14px;
+  border-left: 2px solid var(--button-stroke-active);
+  font: 500 13px/1.6 var(--font-family-base);
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+/* right-click to mark — the highlight "draws" across like a marker pen */
+.markable {
+  border-radius: 4px;
+  scroll-margin-top: 28px;
+}
+
+.markText {
+  background-image: linear-gradient(
+    transparent 50%,
+    rgba(255, 193, 109, 0.3) 50%,
+    rgba(255, 193, 109, 0.3) 94%,
+    transparent 94%
+  );
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-size 0.6s cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+
+.markable[data-marked] .markText {
+  background-size: 100% 100%;
+}
+
+/* jumping from the outline flashes the target for a moment */
+[data-flash] {
+  animation: flash 1.4s ease;
+}
+
+@keyframes flash {
+  0%,
+  30% {
+    background-color: rgba(253, 249, 239, 0.06);
+    box-shadow: 0 0 0 6px rgba(253, 249, 239, 0.06);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+
+/* ------------------------------------------------------- attachments */
+
+.attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.file {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 8px 8px;
+  border-radius: 12px;
+  background: var(--input-background);
+  border: 1px solid var(--button-stroke-active);
+}
+
+.fileIcon {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255, 81, 81, 0.14);
+  color: #ff7a7a;
+}
+
+.fileText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fileName {
+  font: 500 12px/1.2 var(--font-family-base);
+  color: var(--text-primary);
+}
+
+.fileMeta {
+  font: 500 10px/1.2 var(--font-family-base);
+  color: var(--text-tertiary);
+}
+
+/* ----------------------------------------------------------- outline */
+
+.outlineDock {
+  position: absolute;
+  top: 40px;
+  bottom: 170px;
+  z-index: 2;
+  overflow-y: auto;
+  padding-right: 6px;
+  animation: outlineIn 0.3s ease;
+}
+
+@keyframes outlineIn {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+}
+
+/* no room beside the chat: a small button that floats at the top */
+.outlineButton {
+  position: absolute;
+  top: 40px;
+  z-index: 3;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--button-stroke-active);
+  border-radius: 50%;
+  background: var(--surface-raised);
+  color: var(--icon-active);
+  box-shadow: var(--shadow-dropdown);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.2s ease;
+  animation: outlineIn 0.3s ease;
+}
+
+.outlineButton:hover,
+.outlineButton[aria-expanded='true'] {
+  background: var(--button-background);
+}
+
+.outlineButton[data-bump] {
+  animation: bump 0.6s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+@keyframes bump {
+  30% {
+    transform: scale(1.15);
+  }
+}
+
+.outlineBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 7px;
+  background: var(--brand-500);
+  font: 700 9px/14px var(--font-family-base);
+  color: #100f0d;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.outlinePopover {
+  position: absolute;
+  top: 80px;
+  z-index: 4;
+  width: 260px;
+  max-height: min(60vh, 520px);
+  overflow-y: auto;
+  padding: 16px;
+  border: 1px solid var(--button-stroke-active);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-popover);
+  box-sizing: border-box;
+  animation: popoverIn 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes popoverIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+.contextMenu {
+  position: fixed;
+  z-index: 95;
+  border: 1px solid var(--button-stroke);
+  border-radius: 12px;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-popover);
+  animation: popoverIn 0.12s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .markText {
+    transition: none;
+  }
+  [data-flash],
+  .outlineDock,
+  .outlineButton,
+  .outlinePopover {
+    animation: none;
+  }
+}
+
+/* no gutter at all: make room for the floating outline button */
+.chatView[data-cramped] .messages {
+  padding-left: 64px;
 }

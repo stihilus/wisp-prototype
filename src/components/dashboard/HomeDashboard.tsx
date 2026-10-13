@@ -101,6 +101,10 @@ export function HomeDashboard() {
   const filtered = activeFilter !== 'all'
   const visibleWidgets = filtered ? compact(ws.widgets.filter((w) => w.kind === activeFilter)) : ws.widgets
   const hasWidgets = ws.widgets.length > 0
+  // a lone widget takes the whole row (and at least two rows, so lists read as lists);
+  // its saved size comes back as soon as a second widget joins it
+  const single = !filtered && ws.widgets.length === 1
+  const gridWidgets = single ? [{ ...ws.widgets[0], x: 0, y: 0, w: GRID_COLS, h: Math.max(ws.widgets[0].h, 2) }] : visibleWidgets
 
   // reset scroll when switching workspaces
   useEffect(() => {
@@ -271,12 +275,12 @@ export function HomeDashboard() {
         <div className={styles.gridArea} key={ws.id}>
           {hasWidgets ? (
             <WidgetGrid<Widget>
-              items={visibleWidgets}
+              items={gridWidgets}
               cols={GRID_COLS}
               rowHeight={rowHeight}
               gap={GAP}
               maxRows={MAX_ROWS_PER_WIDGET}
-              disabled={filtered}
+              disabled={filtered || single}
               freshIds={freshIds}
               onChange={(layout) => actions.setWidgetLayout(ws.id, layout)}
               renderItem={(widget, ctx) => (
@@ -350,7 +354,7 @@ export function HomeDashboard() {
           )}
         </div>
 
-        {hasWidgets && !filtered && stripTools.length > 0 && (
+        {hasWidgets && !filtered && (
           <section className={styles.strip}>
             <div className={styles.stripHead}>
               <span className={styles.stripTitle}>Add more to {ws.name}</span>
@@ -373,20 +377,19 @@ export function HomeDashboard() {
                   </button>
                 )
               })}
-              {!ws.widgets.some((w) => w.kind === 'news') && (
-                <button type="button" className={styles.stripItem} onClick={() => startAdd('news')} disabled={!!connecting[`${ws.id}:news`]}>
-                  <ToolLogo kind="news" size={24} />
-                  <span className={styles.stripText}>
-                    <span className={styles.stripName}>News</span>
-                    <span className={styles.stripBlurb}>{connecting[`${ws.id}:news`] ? 'Searching…' : 'Sites, topics, companies'}</span>
-                  </span>
-                  {connecting[`${ws.id}:news`] ? (
-                    <span className={`${ui.spinner} ${styles.stripSpinner}`} />
-                  ) : (
-                    <Icon svg={addSmallIcon} size={14} className={styles.stripPlus} />
-                  )}
-                </button>
-              )}
+              {/* like custom widgets, News can be added again for another set of sources */}
+              <button type="button" className={styles.stripItem} onClick={() => startAdd('news')} disabled={!!connecting[`${ws.id}:news`]}>
+                <ToolLogo kind="news" size={24} />
+                <span className={styles.stripText}>
+                  <span className={styles.stripName}>News</span>
+                  <span className={styles.stripBlurb}>{connecting[`${ws.id}:news`] ? 'Searching…' : 'Sites, topics, companies'}</span>
+                </span>
+                {connecting[`${ws.id}:news`] ? (
+                  <span className={`${ui.spinner} ${styles.stripSpinner}`} />
+                ) : (
+                  <Icon svg={addSmallIcon} size={14} className={styles.stripPlus} />
+                )}
+              </button>
               <button type="button" className={styles.stripItem} onClick={() => setFlow({ type: 'modal' })}>
                 <ToolLogo kind="custom" size={24} />
                 <span className={styles.stripText}>

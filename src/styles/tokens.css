@@ -92,6 +92,8 @@
   --scrollbar-track: transparent;
 
   --backdrop: rgba(8, 7, 6, 0.55);
+  /* floating panels that sit on top of the chat surface */
+  --surface-raised: #211e1b;
 
   color-scheme: dark;
 }
@@ -143,6 +145,7 @@
   --scrollbar-track: transparent;
 
   --backdrop: rgba(40, 34, 24, 0.28);
+  --surface-raised: #ffffff;
 
   color-scheme: light;
 }

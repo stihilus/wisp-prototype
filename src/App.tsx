@@ -87,7 +87,7 @@ function App() {
             onOpenChat={handleOpenChat}
           />
 
-          <div className={styles.contentRegion} data-view={view} data-updates={showUpdates}>
+          <div className={styles.contentRegion} data-view={view}>
             <main className={styles.main}>
               {view === 'home' ? (
                 <HomeDashboard />
@@ -97,17 +97,15 @@ function App() {
                 <HomeHero onSend={actions.sendMessage} guidedModelTrigger={guidedModelTrigger} autoSelectModelId="muse-glimmer-30b" />
               )}
             </main>
-            {showUpdates ? (
-              <UpdatesPanel now={now} />
-            ) : (
-              <RightSideNav
-                activePanel={activePanel}
-                onTogglePanel={togglePanel}
-                onClosePanel={closePanel}
-                feedBadge={state.feedBadge}
-                onOpenFeed={actions.openFeed}
-              />
-            )}
+            <RightSideNav
+              activePanel={activePanel}
+              onTogglePanel={togglePanel}
+              onClosePanel={closePanel}
+              feedBadge={state.feedBadge}
+              onOpenFeed={actions.openFeed}
+            />
+            {/* Updates slides over the page instead of squeezing it */}
+            {showUpdates && <UpdatesPanel now={now} />}
           </div>
         </div>
       </div>

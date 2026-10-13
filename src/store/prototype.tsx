@@ -23,6 +23,7 @@ import {
   type Workspace,
 } from '../data/dashboard'
 import { buildDefaultChatThread, genericReply, nextId, scriptedReplies, type ChatMessage } from '../data/messages'
+import { plans, type PlanId, type UsageLevel } from '../data/usage'
 import { compact, findSpot, type GridItem } from '../lib/gridLayout'
 
 // Bump when the persisted shape changes — older saves are dropped, not migrated.
@@ -44,6 +45,10 @@ export type ProtoState = {
   chat: { started: boolean; messages: ChatMessage[] }
   /** first-time experience: welcome on the first launch, feature tips on the second */
   ftu: { visits: number; welcomeDone: boolean; tourDone: boolean }
+  /** answer paragraphs the user highlighted (block ids) */
+  chatMarks: string[]
+  /** plan + how much of its limits the demo has used; `dismissed` hides that level's banner */
+  usage: { plan: PlanId; level: UsageLevel; dismissed: UsageLevel | null }
 }
 
 export type Overlay = 'welcome' | 'tour' | null
@@ -62,6 +67,8 @@ function initialState(): ProtoState {
     feedBadge: 4,
     chat: { started: false, messages: [] },
     ftu: { visits: 0, welcomeDone: false, tourDone: false },
+    chatMarks: [],
+    usage: { plan: 'free', level: 'normal', dismissed: null },
   }
 }
 
@@ -141,6 +148,8 @@ function useProtoValue() {
   const [overlay, setOverlay] = useState<Overlay>(null)
   /** bumps each time the Report button should pulse + show its hint */
   const [reportNudge, setReportNudge] = useState(0)
+  /** usage popover under the ring in the top bar — also opened by "View usage" */
+  const [usageOpen, setUsageOpen] = useState(false)
   const chatTimers = useRef<number[]>([])
   const connectingRef = useRef<Record<string, boolean>>({})
   const stateRef = useRef(state)
@@ -444,6 +453,7 @@ function useProtoValue() {
     // a reset behaves like a fresh install: chat home + the welcome screen
     setState({ ...initialState(), ftu: { visits: 1, welcomeDone: false, tourDone: false } })
     setToasts([])
+    setUsageOpen(false)
     setOverlay('welcome')
   }, [])
 
@@ -460,6 +470,14 @@ function useProtoValue() {
   const closeWelcome = useCallback((outcome: 'done' | 'later') => {
     setOverlay(null)
     if (outcome === 'done') setState((s) => ({ ...s, ftu: { ...s.ftu, welcomeDone: true } }))
+  }, [])
+
+  /** highlight / un-highlight a paragraph in a long answer */
+  const toggleMark = useCallback((blockId: string) => {
+    setState((s) => ({
+      ...s,
+      chatMarks: s.chatMarks.includes(blockId) ? s.chatMarks.filter((m) => m !== blockId) : [...s.chatMarks, blockId],
+    }))
   }, [])
 
   /** draw attention to the Report button in the right rail */
@@ -542,6 +560,32 @@ function useProtoValue() {
   const openFeed = useCallback(() => {
     setState((s) => ({ ...s, updatesOpen: true, feedBadge: 0 }))
   }, [])
+
+  /* --------------------------------------------------------- plan & usage */
+
+  const setPlan = useCallback((plan: PlanId) => setState((s) => ({ ...s, usage: { ...s.usage, plan } })), [])
+
+  const setUsageLevel = useCallback(
+    (level: UsageLevel) => setState((s) => ({ ...s, usage: { ...s.usage, level, dismissed: null } })),
+    [],
+  )
+
+  /** × on the banner — it stays hidden until usage crosses the next threshold */
+  const dismissUsageBanner = useCallback(() => setState((s) => ({ ...s, usage: { ...s.usage, dismissed: s.usage.level } })), [])
+
+  /** Upgrade / "Get <plan>" — moves to the next plan; the same usage is a small share of the bigger limits */
+  const upgradePlan = useCallback(() => {
+    const prev = stateRef.current.usage
+    const next = plans[prev.plan].next
+    if (!next) return
+    setUsageOpen(false)
+    setState((s) => ({ ...s, usage: { plan: next, level: 'normal', dismissed: null } }))
+    toast(`You're on ${plans[next].name} now`, 'Undo', () => setState((s) => ({ ...s, usage: prev })))
+  }, [toast])
+
+  const openUsage = useCallback(() => setUsageOpen(true), [])
+  const closeUsage = useCallback(() => setUsageOpen(false), [])
+  const toggleUsage = useCallback(() => setUsageOpen((v) => !v), [])
 
   /* ---------------------------------------------------------------- chat */
 
@@ -648,6 +692,14 @@ function useProtoValue() {
       startTour,
       endTour,
       nudgeReport,
+      toggleMark,
+      setPlan,
+      setUsageLevel,
+      dismissUsageBanner,
+      upgradePlan,
+      openUsage,
+      closeUsage,
+      toggleUsage,
     }),
     // every action above is stable (useCallback over setters / refs)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -656,7 +708,7 @@ function useProtoValue() {
 
   const activeWorkspace = state.workspaces.find((w) => w.id === state.activeWorkspaceId) ?? state.workspaces[0]
 
-  return { state, activeWorkspace, actions, toasts, connecting, freshIds, refreshing, overlay, reportNudge }
+  return { state, activeWorkspace, actions, toasts, connecting, freshIds, refreshing, overlay, reportNudge, usageOpen }
 }
 
 type ProtoValue = ReturnType<typeof useProtoValue>

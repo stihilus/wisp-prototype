@@ -1,5 +1,6 @@
 import { Icon } from './Icon'
 import { PrototypeMenu } from './PrototypeMenu'
+import { UsageControls } from './usage/UsageControls'
 import {
   lockerIcon,
   newsDotIcon,
@@ -44,6 +45,8 @@ export function TopNav({ onToggleSidebar, onToggleTheme, onOpenReleaseModal, sid
       </div>
       <div className={styles.right}>
         <PrototypeMenu />
+        <UsageControls />
+        <span className={styles.divider} />
         <span className={styles.privateLabel}>Private</span>
         <Icon svg={lockerIcon} className={styles.privateIcon} />
       </div>

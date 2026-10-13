@@ -5,14 +5,24 @@
   align-items: flex-end;
 }
 
-.protectedTab {
+/* tabs tucked under the top edge of the input: the usage banner + Private */
+.tabs {
   position: relative;
   z-index: 0;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: var(--gap-sm);
+  margin-bottom: -26px;
+}
+
+.protectedTab {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 7px;
   padding: 6px var(--padding-md) 32px;
-  margin-bottom: -26px;
   border: 1px solid var(--input-stroke);
   border-bottom: none;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -73,6 +83,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.card[data-paused='true'] .toolbar,
+.micButton:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.textarea:disabled {
+  cursor: not-allowed;
 }
 
 .toolbar {

@@ -38,6 +38,7 @@
 }
 
 .contentRegion {
+  position: relative;
   flex: 1;
   min-width: 0;
   display: flex;
@@ -51,22 +52,9 @@
   border-top-left-radius: var(--radius-xl);
 }
 
-/* with Updates docked, only the chat itself is a card — rounded on both top corners */
-.contentRegion[data-view='chat'][data-updates='true'] {
-  background: transparent;
-}
-
 .main {
   flex: 1;
   min-width: 0;
   min-height: 0;
   position: relative;
-  transition:
-    background-color 0.25s ease,
-    border-radius 0.25s ease;
-}
-
-.contentRegion[data-view='chat'][data-updates='true'] .main {
-  background: var(--field-background-chat);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }

@@ -75,3 +75,50 @@
   font: 500 10px/1.4 var(--font-family-base);
   color: var(--text-tertiary);
 }
+
+.segRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+}
+
+.segLabel {
+  width: 38px;
+  flex-shrink: 0;
+  font: 500 10px/1 var(--font-family-base);
+  color: var(--text-tertiary);
+}
+
+.seg {
+  flex: 1;
+  display: flex;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--button-background);
+}
+
+.seg button {
+  flex: 1;
+  height: 24px;
+  padding: 0 4px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font: 500 10px/1 var(--font-family-base);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease;
+}
+
+.seg button:hover {
+  color: var(--text-secondary);
+}
+
+.seg button[data-active='true'] {
+  background: var(--input-background);
+  color: var(--text-primary);
+}

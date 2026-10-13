@@ -141,7 +141,8 @@ export function FeatureTour() {
           ))}
         </div>
         <div className={styles.buttons}>
-          {index > 0 && (
+          {/* the last step has no room for Back next to its two buttons — ← still goes back */}
+          {index > 0 && !last && (
             <button type="button" className={styles.back} onClick={back}>
               Back
             </button>

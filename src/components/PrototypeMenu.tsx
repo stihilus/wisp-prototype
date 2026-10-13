@@ -3,6 +3,7 @@ import { Icon } from './Icon'
 import { Popover } from './ui/Popover'
 import { chevSmallIcon, feedbackFilledIcon } from '../assets/icons'
 import { usePrototype, type Scenario } from '../store/prototype'
+import { planOrder, plans, type UsageLevel } from '../data/usage'
 import ui from './ui/controls.module.css'
 import styles from './PrototypeMenu.module.css'
 
@@ -12,11 +13,18 @@ const scenarios: { id: Scenario; title: string; desc: string }[] = [
   { id: 'all', title: 'Everything connected', desc: 'Full dashboard, charts included' },
 ]
 
+const usageLevels: { id: UsageLevel; label: string }[] = [
+  { id: 'normal', label: '30%' },
+  { id: 'pace', label: 'Week pace' },
+  { id: 'near', label: '75%' },
+  { id: 'reached', label: '100%' },
+]
+
 // Not part of the product — a small control for whoever is demoing the
 // prototype, so they can jump between the Figma states without clicking
 // through every flow.
 export function PrototypeMenu() {
-  const { activeWorkspace, actions } = usePrototype()
+  const { state, activeWorkspace, actions } = usePrototype()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLButtonElement>(null)
 
@@ -94,6 +102,29 @@ export function PrototypeMenu() {
                 </span>
               </button>
             ))}
+            <div className={ui.menuDivider} />
+            {/* stays open so you can watch the ring, pill and banner change */}
+            <span className={`${ui.sectionLabel} ${styles.label}`}>Plan & usage</span>
+            <div className={styles.segRow}>
+              <span className={styles.segLabel}>Plan</span>
+              <div className={styles.seg}>
+                {planOrder.map((p) => (
+                  <button key={p} type="button" data-active={state.usage.plan === p} onClick={() => actions.setPlan(p)}>
+                    {plans[p].short}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className={styles.segRow}>
+              <span className={styles.segLabel}>Usage</span>
+              <div className={styles.seg}>
+                {usageLevels.map((l) => (
+                  <button key={l.id} type="button" data-active={state.usage.level === l.id} onClick={() => actions.setUsageLevel(l.id)}>
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className={ui.menuDivider} />
             <button
               type="button"

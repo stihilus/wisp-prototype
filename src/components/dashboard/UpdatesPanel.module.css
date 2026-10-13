@@ -1,10 +1,19 @@
+/* a sheet that slides over the right edge — the dashboard or chat underneath keeps its width */
 .panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
   width: 362px;
-  flex: 0 0 auto;
-  height: 100%;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  background: var(--background-primary);
+  border-top: 1px solid var(--line-default);
+  border-left: 1px solid var(--line-default);
+  border-top-left-radius: var(--radius-xl);
+  box-shadow: -24px 0 48px rgba(0, 0, 0, 0.45);
   animation: slideIn 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
