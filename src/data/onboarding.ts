@@ -1,5 +1,5 @@
 // First-time experience content.
-// 1st launch: the Welcome modal (+ optional 5-step "See how it works").
+// 1st launch: the Welcome modal (+ the 5-step "How it works").
 // 2nd launch: feature tips anchored to the real UI, one after another.
 
 import step1 from '../assets/onboarding/step1.png'
@@ -16,11 +16,11 @@ export type IntroStep = { image: string; title: string; body: RichText }
 export const introSteps: IntroStep[] = [
   {
     image: step1,
-    title: 'Privacy first',
+    title: 'Privacy by design',
     body: [
-      'Your requests run in a ',
-      { b: 'hardware-backed enclave' },
-      ' — your identity never reaches the AI. Verifiable in the ',
+      'Wisp runs AI in ',
+      { b: 'sealed hardware' },
+      ' that nobody, including us, can see inside of. No “trust us”: check it yourself in the ',
       { b: 'Verification Center' },
       '.',
     ],
@@ -28,26 +28,22 @@ export const introSteps: IntroStep[] = [
   {
     image: step2,
     title: 'Chat & projects',
-    body: [
-      'Just start asking — no setup needed. Attach a folder to turn it into a Project: the agent works with its files, and permissions ask before actions.',
-    ],
+    body: ['Talk to Wisp privately about anything, or let it work with your files to analyze docs, create reports or write code.'],
   },
   {
     image: step3,
-    title: 'Meetings',
-    body: [
-      'Wisp notices calls and offers to record; transcription happens on-device, call audio never leaves your device. Ask Wisp about your calls or reference any recording in chat with #.',
-    ],
+    title: 'Confidential notetaker',
+    body: ['Record your meetings without a bot joining the call. Wisp transcribes and stores your notes locally, then deletes the audio.'],
   },
   {
     image: step4,
-    title: 'Connectors',
-    body: ['Hook up Gmail, Calendar, Notion and more — Wisp asks before it touches anything in them.'],
+    title: 'Connect your tools',
+    body: ['Hook up Gmail, Notion, Telegram or custom connections. Set up rules on how Wisp can use them.'],
   },
   {
     image: step5,
-    title: 'You’re all set',
-    body: ['Start a chat, drop in a folder, or let Wisp catch your next call. Everything stays on your terms.'],
+    title: 'Schedule your tasks',
+    body: ['Set up recurring tasks for the Wisp agent: daily briefs, competitive research or alert bots.'],
   },
 ]
 
